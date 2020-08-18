@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Sparky Home</title>
+
+    <!-- stylesheets -->
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+
+  </head>
+  <body>  
+    
+    <!-- auth modals -->
+    <div class="auth open">
+      <button id="sign-in" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+        <i class="material-icons">account_circle</i>Sign-in with Google
+      </button>
+
+      <div class="modal">
+        <h2>Login</h2>
+        <form class="login">
+          <input type="text" name="email" placeholder="Email">
+          <input type="password" name="password" placeholder="Password">
+          <button>Login</button>
+          <p class="error"></p>
+        </form>
+        <div>Sem conta? <a class="switch">Registre agora.</a></div>
+      </div>
+      <div class="modal">
+        <h2>Registrar</h2>
+        <form class="register">
+          <input type="text" name="email" placeholder="Email">
+          <input type="password" name="password" placeholder="Password">
+          <button>Registrar</button>
+          <p class="error"></p>
+        </form>
+        <div>Tem conta? <a class="switch">Login agora.</a></div>
+      </div>
+    </div>
+    
+
+    <!-- update the version number as needed -->
+    <script src="/__/firebase/7.15.3/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script src="/__/firebase/7.15.3/firebase-auth.js"></script>
+    <script src="/__/firebase/7.15.3/firebase-database.js"></script>
+    <!-- initialize the SDK after all desired features are loaded -->
+    <script src="/__/firebase/init.js"></script>
+    
+    <script src="js/auth.js"></script>
+  </body>
+</html>
