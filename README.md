@@ -13,5 +13,6 @@ This project is a development of a Home Automation System that uses Google Cloud
 # Devices Properties
  - Update OTA
  - Query HTTP
+ - WifiManager for automatic network discover
  - Arduino
  - ESP
