@@ -6,17 +6,13 @@
     <title>Welcome to Sparky Home</title>
 
     <!-- stylesheets -->
-    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <link rel="stylesheet" type="text/css" href="./css/styles.css">
 
   </head>
   <body>  
     
     <!-- auth modals -->
     <div class="auth open">
-      <button id="sign-in" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
-        <i class="material-icons">account_circle</i>Sign-in with Google
-      </button>
-
       <div class="modal">
         <h2>Login</h2>
         <form class="login">
@@ -25,6 +21,9 @@
           <button>Login</button>
           <p class="error"></p>
         </form>
+        <p>-------  Or  -------</p>
+      <div id="sign-in" class="sign-in" >
+      </div>
         <div>Sem conta? <a class="switch">Registre agora.</a></div>
       </div>
       <div class="modal">
@@ -48,6 +47,6 @@
     <!-- initialize the SDK after all desired features are loaded -->
     <script src="/__/firebase/init.js"></script>
     
-    <script src="js/auth.js"></script>
+    <script type="text/javascript" src="./js/auth.js"></script>
   </body>
 </html>

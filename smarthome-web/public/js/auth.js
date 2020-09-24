@@ -21,6 +21,7 @@ loginForm.addEventListener('submit', (e) => {
     firebase.auth().signInWithEmailAndPassword(email, password)
       .then(user => {
         console.log('logged in', user);
+
         loginForm.reset();
       })
       .catch(error => {
@@ -47,26 +48,25 @@ signInButtonElement.addEventListener('click', signIn);
 function signIn() {
   // Sign into Firebase using popup auth & Google as the identity provider.
   var provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider).then(
-     function (result) {
-          var token = result.credential.accessToken;
-          var user = result.user;
+  firebase.auth().signInWithPopup(provider)
+    .then(function (result) {
+      var token = result.credential.accessToken;
+      var user = result.user;
 
-          //this is what you need
-          var isNewUser = result.additionalUserInfo.isNewUser;
-          if (isNewUser) {
-               //delete the created user
-               result.user.delete();
-               console.log('user is new');
-          } else {
-               // your sign in flow
-               console.log('user ' + user.email + ' does exist!');
-               window.location.replace("main.html"); 
-          }
-     }).catch(function (error) {
+      //this is what you need
+      var isNewUser = result.additionalUserInfo.isNewUser;
+      if (isNewUser) {
+           //delete the created user
+           result.user.delete();
+           console.log('user is new');
+      } else {
+           // your sign in flow
+           console.log('user ' + user.email + ' does exist!');
+           window.location.replace("main.html"); 
+      }
+    }).catch(function (error) {
      // Handle Errors here.
-
-});
+    });
 }
 
 
