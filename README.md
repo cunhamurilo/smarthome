@@ -12,5 +12,6 @@ This project is a development of a Home Automation System that uses Google Cloud
 
 # Devices Properties
  - Update OTA
- - Arduino 
+ - Query HTTP
+ - Arduino
  - ESP
