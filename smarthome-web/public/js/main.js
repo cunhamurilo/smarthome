@@ -3,15 +3,18 @@ const userImage = document.querySelector('.user-image');
 const userName = document.querySelector('.user-name');
 const authContent = document.querySelector('.content');
 
-const requestLink = document.querySelector('.add-device');
 const requestModal = document.querySelector('.new-request');
 const modal = document.querySelector('.modal');
-// Form add new device
+const avatarDropdown = document.querySelector(".demo-avatar-dropdown");
 
-const modalContent2 = (values) => {
+const listRoom = ['Living Room', 'Garden', 'Office', 'Dinner Room', 'Kitchen', 'Bedroom', 'Bathroom', 'Garage', 'Hall'];
+
+let dev = [];
+// Form add new device
+const modalContentAddDevice = (values) => {
   return (`
   <h3>Add a new Device</h3>
-  <form>
+  <form action="javascript:;" onsubmit="addDevice()" >
     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
       <input class="mdl-textfield__input" hidden type="text" value="${values[1]}" id="deviceId" >
       <label class="mdl-textfield__label" for="deviceId">Device Id: ${values[1]}</label>
@@ -21,24 +24,17 @@ const modalContent2 = (values) => {
       <label class="mdl-textfield__label" for="type">Type: ${values[2]}</label>
     </div>
     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-      <input class="mdl-textfield__input" type="text" id="city" required >
-      <label class="mdl-textfield__label" for="city">City...</label>
-    </div>
-    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-      <input class="mdl-textfield__input" type="text" id="room" required>
-      <label class="mdl-textfield__label" for="room">Room...</label>
-    </div>
-    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
       <input class="mdl-textfield__input" type="text" id="name" required>
       <label class="mdl-textfield__label" for="name">Name...</label>
     </div>
     <input class="mdl-textfield__input" hidden type="text" value="${values[0]}" id="devicePos" >
     
-    <button onclick="addDevice()">Submit Device</button>
+    <button id="btn" style="background-color:#777">Submit Device</button>
     <p class="error"></p>
   </form>
   `);
 }
+
 // Form add new device
 const modalContent = `
   <h3>Select a Device</h3>
@@ -46,174 +42,134 @@ const modalContent = `
   </form>
 `;
 
-modal.innerHTML = modalContent;
+const layoutCity = `
+  <h1>Dashboard</h1>
+  <div class="mdl-layout-spacer"></div>
+  <h4 style="padding-top: 20px;">
+    <span id="cities_name" >No city</span>
+    <button id="cities_btn" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+      <i class="material-icons" role="presentation">arrow_drop_down</i>
+      <span class="visuallyhidden">Accounts</span>
+    </button>
+    <ul id="cities_btn_ul" class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="cities_btn">
+      <li class="mdl-menu__item cities mdl-button" style="text-transform: none;><i class="material-icons">add</i> Add another city ...</li>
+    </ul>
+    <div class="mdl-tooltip" data-mdl-for="cities_btn">
+      Options
+    </div>
+  </h4>
+`;
+avatarDropdown.innerHTML = layoutCity;
 
 // Reference database
 const db = firebase.database();
 
+const click = function() {
+  this.classList.toggle("activeColl");
+  var content = this.nextElementSibling;
+  if (content.style.maxHeight){
+    content.style.maxHeight = null;
+  } else {
+    content.style.maxHeight = "100%";
+  } 
+}
+
 // Set collapsible list itens
 const listItem = (item) => {
   for (let i = 0; i < item.length; i++) {
-    item[i].addEventListener("click", function() {
-      this.classList.toggle("activeColl");
-      var content = this.nextElementSibling;
-      if (content.style.maxHeight){
-        content.style.maxHeight = null;
-      } else {
-        content.style.maxHeight = "1080px";
-      } 
-    });
+    item[i].addEventListener("click", click);
   }
 };
 
-// Set update list itens
-const listUpdate = (item) => {
-  for (let i = 0; i < item.length; i++) {
-    item[i].addEventListener("click", function() {
-      //console.log(item[i]);
-      updateState(item[i].id);
-    });
-  }
-};
+const config = function() {
+  let typeBtn = this.id.split("__");
+  if(typeBtn[2] == "close"){
+    removeHtml(this);
+  }else if(typeBtn[2] == "config"){
+    configHtml(this);
+  }else if(typeBtn[2] == "addDevice"){
+    layoutAddDevice();
+  }else if(typeBtn[2] == "update"){
+    updateState(`${typeBtn[0]}__${typeBtn[1]}`);
+  }else if(typeBtn[0] == "city" || typeBtn[0] == "addCity" || typeBtn[0] == "removeCity"){
+    listCityBtn(this);
+  }else if(typeBtn[2] == "newRoom" || typeBtn[2] == "newCity" ){
+    moveDevice(this);
+  }else if(typeBtn[0] == "selectItem" ){
+    requestModal.querySelector('.error').textContent = '';
+    let btn = document.getElementById('btn')
+    btn.style.backgroundColor = "#ee8905";
+  }else if(typeBtn[0] == "name"){
+    let btn = document.getElementById('btn')
+    if(this.value == "")
+      btn.style.backgroundColor = "#777";
+    this.addEventListener("keydown", function(event) {
+      if(event.key != ""){
+        btn.style.backgroundColor = "#ee8905";
+      }
 
-// Set close list itens
-const listClose = (item) => {
-  for (let i = 0; i < item.length; i++) {
-    item[i].addEventListener("click", function() {
-      //console.log(item[i]);
-      removeHtml(item[i]);
-    });
+      if(( this.value.length == 1 || this.value.length == 0) && event.key == "Backspace" ){
+        btn.style.backgroundColor = "#777";
+      }
+
+     });
+    
   }
+
 };
 
 // Set close list itens
 const listConfig = (item) => {
   for (let i = 0; i < item.length; i++) {
-    item[i].addEventListener("click", function() {
-      //console.log(item[i]);
-      configHtml(item[i]);
-    });
+    item[i].addEventListener("click", config );
   }
 };
-
-// Move device to another room
-const moveDevice = (item) => {
-  for (let i = 0; i < item.length; i++) {
-    item[i].addEventListener("click", function() {
-      let values = item[i].id.split('__');
-      // reference to database
-      const user = firebase.auth().currentUser;
-
-      // check user is logged
-      if(user){
-        const reqModal = document.querySelector('.new-request');
-        
-        let devicesItems = document.getElementById(`${values[0]}__${values[1]}__devices`);
-
-        if(values[3] != 'newCity' && values[3] != 'newRoom' ){
-          db.ref('users/'+user.uid+'/devices/'+values[2]).update({roomHint:values[3]});
-          reqModal.classList.remove('open');
-          
-          if(devicesItems.childElementCount == 0){
-            let card = document.getElementById(`${values[0]}__${values[1]}__field`);
-            card.remove();
-          }
-        }else{
-          let option = 'Enter a new City';
-          let contentForm = `
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-              <input class="mdl-textfield__input" type="text" id="name" required>
-              <label class="mdl-textfield__label" for="name">Name...</label>
-            </div>
-          `;
-          if(values[3] == 'newRoom'){
-            option = 'Choose a new Room';
-            const listRoom = ['Living Room', 'Garden', 'Office', 'Dinner Room', 'Kitcken', 'Bedroom', 'Bathroom', 'Garage', 'Hall'];
-            listRoom.sort();
-
-            contentForm = ` <div class="radios">`;
-            listRoom.forEach(room =>{
-              contentForm += ` <input type="radio" name="rGroup" id='${room}'/>
-              <label  class="mdl-list2" for="${room}">
-                  <span>${room}</span>
-              </label>`;
-            });
-                   
-            contentForm += `</div>`;
-          }
-
-          reqModal.innerHTML = ` <div class='modal'>
-              <h3>${option}</h3>
-              <form action="javascript:;" onsubmit="updateMove(this)" id="${item[i].id}">
-                ${contentForm}
-              <br><br><button >${option}</button>
-            </form>
-            <p class="error"></p>
-            </div>`;
-            
-          componentHandler.upgradeAllRegistered();
+ 
+// Set city list itens
+const listCityBtn = (item) => {
+      const cities_name = document.getElementById('cities_name');
+      if(item.id == "city"){
+        cities_name.innerText = item.innerHTML;
+        // reference to database
+        const user = firebase.auth().currentUser;
+        homeContent.innerText = "";
+        if(user){
+          // get device Id
+          db.ref('users/'+user.uid+'/actual_city').update({actual:item.innerHTML});
         }
-        // const reqModal = document.querySelector('.new-request');
-        // reqModal.classList.remove('open');
-      }else
-        console.log("Usuário desconectado.");
-
-    });
-  }
-};
-
-const updateMove = (element) => {
-  const val = element.id.split('__');
-  const user = firebase.auth().currentUser;
-
-  let devicesItems = document.getElementById(`${val[0]}__${val[1]}__devices`);
-  let collapsTitle = document.getElementById(`${val[0]}__title`);
-  let collaps = document.getElementById(`${val[0]}`);
-  let item = document.getElementById(val[2]);
-
-  // check user is logged
-  if(user){
-    const reqModal = document.querySelector('.new-request');
-    if(val[3] != 'newRoom'){
-      const input = element.querySelector("input");
-
-      console.log('cities: ',cities);
-      if(collaps.childElementCount == 1){
-        collaps.remove();
-        cities.splice(cities.indexOf(collapsTitle.innerText), 1) 
-        collapsTitle.remove();
-      }
-      console.log('cities: ',cities);
-
-      if (item){  
-        item.remove();
-      }
-
-      db.ref('users/'+user.uid+'/devices/'+val[2]).update({city:input.value});
-      reqModal.classList.remove('open');
-      componentHandler.upgradeAllRegistered();
-    }else{
-      const radioChecked = document.querySelector('input[name="rGroup"]:checked');
-      if(radioChecked){
-
-        if(devicesItems.childElementCount == 1){
-          let card = document.getElementById(`${val[0]}__${val[1]}__field`);
-          card.remove();
-        }
-
-        db.ref('users/'+user.uid+'/devices/'+val[2]).update({roomHint:radioChecked.id});
-        reqModal.classList.remove('open');
+        //setupHome(dev);
         componentHandler.upgradeAllRegistered();
-
       }else{
-        reqModal.querySelector('.error').textContent = 'Select a room to continue';
-      }
-    }
-    
+        requestModal.classList.add('open');
 
-  }else
-    console.log("Usuário desconectado.");
-  
+        let option = 'Enter a new City';
+        let contentForm = `
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="mdl-textfield__input" type="text" id="name" required>
+            <label class="mdl-textfield__label" for="name">Name...</label>
+          </div>
+        `;
+        let styleBtn = `style="background-color:#777"`;
+
+        if(item.id == "removeCity"){
+          option = 'Remove City';
+          contentForm = ``;
+          styleBtn = `style="background-color:#ee8905"`;
+        }
+
+        modal.innerHTML = ` 
+            <h3>${option}</h3>
+            <form action="javascript:;" onsubmit="cityUpdate(this)" id="${item.id}">
+              ${contentForm}
+            <br><br><button id="btn" ${styleBtn}>${option}</button>
+          </form>
+          <p class="error"></p>
+        `;
+        let itens = modal.getElementsByClassName("mdl-textfield__input");
+        listConfig(itens);
+
+        componentHandler.upgradeAllRegistered();
+      }
 }
 
 // Sign out
@@ -225,6 +181,7 @@ signOut.addEventListener('click', () => {
 
 // Auth listener
 firebase.auth().onAuthStateChanged(user => {
+  
   if (user) {
     console.log('connected');
     // Set the user's profile name.
@@ -245,27 +202,25 @@ firebase.auth().onAuthStateChanged(user => {
 });
 
 // Open request modal
-requestLink.addEventListener('click', (e) => {
-  e.preventDefault();
+const layoutAddDevice = async() => {
   requestModal.classList.add('open');
-
   modal.innerHTML = modalContent;
   const item = document.getElementById('listDevices');
 
   let html = `<div class="radios">`;
-  db.ref('available-devices').once('value').then( snap => {
+  await db.ref('available-devices').once('value').then( snap => {
     if(snap.exists()){
       snap.forEach(device => {
         html += `
-        <input type="radio" name="rGroup" value="${device.key+'/'+device.val().id+'/'+device.val().type}" id="${device.val().id}" />
-        <label class="mdl-chip" for="${device.val().id}">
+        <input type="radio" name="rGroup" value="${device.key+'/'+device.val().id+'/'+device.val().type}" id="${device.key}" />
+        <label class="mdl-chip" for="${device.key}" id="selectItem">
             <span class="mdl-chip__text">${device.val().id}</span>
         </label>
         `;
       });
       html += `</div>`;
       item.innerHTML = html;
-      modal.insertAdjacentHTML("beforeend",`<br><br><button onclick="selectedDevice()">Next</button><p class="error"></p>`);
+      modal.insertAdjacentHTML("beforeend",`<br><br><button style="background-color:#777" id="btn" onclick="selectedDevice()">Next</button><p class="error" style="margin-top:15px;"></p>`);
       componentHandler.upgradeAllRegistered();
     }else{
       item.innerHTML = `No available devices.`;
@@ -274,8 +229,13 @@ requestLink.addEventListener('click', (e) => {
     }
   });
 
-});
+  let itens = item.getElementsByClassName("mdl-chip");
+  listConfig(itens);
+ 
+  
+}
 
+// Get selected device
 const selectedDevice = () => {
   const radioChecked = document.querySelector('input[name="rGroup"]:checked');
 
@@ -283,7 +243,9 @@ const selectedDevice = () => {
     modal.querySelector('.error').textContent = '';
 
     var res = radioChecked.value.split("/");
-    modal.innerHTML = modalContent2(res);   
+    modal.innerHTML = modalContentAddDevice(res);   
+    let itens = modal.getElementsByClassName("mdl-textfield__input");
+    listConfig(itens);
     componentHandler.upgradeAllRegistered();
   }else{
     modal.querySelector('.error').textContent = 'Select a device to continue';
@@ -294,7 +256,7 @@ const selectedDevice = () => {
 window.onclick = function(event) {
   if (event.target == requestModal) {
     requestModal.classList.remove('open');
-    modal.innerHTML = modalContent;
+    modal.innerHTML = '';
   }
 }
 
@@ -313,14 +275,67 @@ function getProfilePicUrl() {
 
 // Get data drom database
 function getDataFirebase(user){
-  let dbChild = db.ref("users/"+user.uid+'/devices').on('value', snapshot =>{
-      setupHome(snapshot);
+  db.ref("users/"+user.uid+'/').on('value', snapshot =>{
+      //setupHome(snapshot);
+      dev = snapshot;
+      setupHome(dev);
   });
+}
+
+// Handle add new city
+const cityUpdate = (element) => {
+  // reference to database
+  const user = firebase.auth().currentUser;
+  const reqModal = document.querySelector('.new-request');
+
+  if(element.id == "removeCity"){
+    const cities_name = document.getElementById('cities_name');
+    
+    homeContent.innerHTML = '';
+    db.ref('users/'+user.uid+'/devices').once('value', snapshot => {
+      snapshot.forEach(device => {
+        if(device.val().city == cities_name.innerText)
+          db.ref('users/'+user.uid+'/devices/'+device.key).update({city:"", roomHint:""})
+      })
+    })
+    db.ref('users/'+user.uid+'/cities').once('value', snapshot => {
+      snapshot.forEach(city => {
+        if(city.val() == cities_name.innerText){
+          db.ref('users/'+user.uid+'/cities/'+city.key).remove();
+        }
+      })
+    })
+    cities_name.innerText = "No City";
+    db.ref('users/'+user.uid+'/cities').limitToFirst(1).once('value', snapshot => {
+      if(snapshot.numChildren() == 0){
+        db.ref('users/'+user.uid+'/actual_city').update({actual:""})
+      }
+
+      snapshot.forEach(city => {
+        db.ref('users/'+user.uid+'/actual_city').update({actual:city.val()})
+      })
+    })
+    
+
+    componentHandler.upgradeAllRegistered();
+  }else if(element.id == 'addCity'){
+    const input = element.querySelector("input");
+   
+    let cityId = getId(user,'cities', input.value);
+    if(cityId == "")
+      cityId = db.ref('users/'+user.uid+'/cities/').push().key;
+
+    let updates = {};
+    updates[cityId] = input.value;
+    db.ref('users/'+user.uid+'/cities').update(updates);
+    db.ref('users/'+user.uid+'/actual_city').update({actual:input.value});
+  } 
+  reqModal.classList.remove('open');
+  componentHandler.upgradeAllRegistered();
 }
 
 // Handle add new device
 const addDevice = () => {
-
     const requestForm = document.querySelector('.new-request form');
     
     // reference to database
@@ -328,15 +343,12 @@ const addDevice = () => {
   
     // check user is logged
     if(user){
-      place = requestForm.room.value;
       nameDevice = requestForm.name.value;
       typeDevice = requestForm.type.value;
-      city = requestForm.city.value;
       deviceId = requestForm.deviceId.value;
       devicePos = requestForm.devicePos.value;
-  
-      let pkg = {};
-      let traits = {};
+
+      let pkg = {}, pkgPath = {}, traits = {};
       let cont = 1;
       switch(typeDevice){
         case 'LIGHT':
@@ -352,38 +364,31 @@ const addDevice = () => {
           traits.OnOff = { on: false};
           break;
       }
-  
-      // get amount of devices in database
-      let index = 0;
-      db.ref("users/"+user.uid+"/devices/").on('value', snap => {
-        snap.forEach((devices) => {
-          index++;
-        });
-      });
-  
-      index++;
       
-      let pkgPath = {
-        numId: index,
-        path: user.uid+'/devices/device'
-      };
-      
-      db.ref('devices-path/'+deviceId).update(pkgPath);
-  
       for (let i = 0; i < cont; i++ ){
+        let id = db.ref('users/'+user.uid+'/devices/').push().key;
+        
         let n = nameDevice;
         if(typeDevice == 'LINEFILTER'){
           n= n + i;
-          pkg['device'+index] = {traits,type:'action.devices.types.SWITCH',name:n,roomHint:place,city:city};
-        }else
-          pkg['device'+index] = {traits,type:'action.devices.types.'+typeDevice,name:n,roomHint:place,city:city};
-        index++;
+          pkg[id] = {traits,type:'action.devices.types.SWITCH',name:n,roomHint:"",city:""};
+          let p = 'path'+i;
+          pkgPath[p] = user.uid+'/devices/'+id
+        }else{
+          pkg[id] = {traits,type:'action.devices.types.'+typeDevice,name:n,roomHint:"",city:""};
+          let p = 'path'+i;
+          pkgPath[p] = user.uid+'/devices/'+id
+        }
       }
   
+      // update path device to database
+      //db.ref('devices-path/'+deviceId).update(pkgPath);
+
       // add new device to database
-      db.ref('users/'+user.uid+'/devices/').update(pkg);
+      //db.ref('users/'+user.uid+'/devices/').update(pkg);
   
-      db.ref('available-devices/'+devicePos).remove();
+      // remove device in available devices
+      //db.ref('available-devices/'+devicePos).remove();
       
       requestForm.reset();
       requestForm.querySelector('.error').textContent = "";
@@ -396,35 +401,50 @@ const addDevice = () => {
   
   };
 
-// Handle remove device
-const removeDevice = (path) => {
 
-  const requestForm = document.querySelectorAll('.new-request form fieldset');
+// Handle remove device
+const removeDevice = (name) => {
  
   // reference to database
   const user = firebase.auth().currentUser;
-  
+  let deviceId = '';
   if(user){
-    requestForm.forEach( element => {  
-    console.log(element.children.item(0).innerText);
-    
-    // check checkbox is selected
-    if(element.children.item(1).children.item(0).children.item(0).checked)
-      db.ref("users/"+user.uid+"/devices/"+element.id).remove();
-    });
+    // get device Id
+    deviceId = getId(user,'devices',name);
+    db.ref('users/'+user.uid+'/devices/'+deviceId).update({roomHint:'',city: ""});
     requestModal.classList.remove('open');
   }
+}
+
+// Get id in database
+const getId = (user, type, name) => {
+  let id = '';
+  db.ref("users/"+user.uid+"/"+type).once('value', snapshot =>{
+    snapshot.forEach(item => {
+      if(type == 'devices'){
+        if(item.val().name == name){
+          id = item.key;
+        }
+      }else{
+        if(item.val() == name){
+          id = item.key;
+        }
+      }
+    })
+  });
+  return id;
 }
 
 // Handle update database with respective information
 const updateState = (path) => {
   let fieldsets = document.querySelectorAll(`#${path}__field fieldset`);
+  let name = document.getElementById(`${path}__title`);
 
   // loop of devices getting data 
-  fieldsets.forEach( (item) => {
     let traits = {};
-    for (j = 0; j < item.elements.length; j++) {
-      const el = item.elements[j];
+    const elements = fieldsets.item(0).elements;
+    for (j = 0; j < elements.length; j++) {
+      const el = elements[j];
       switch(el.type){
         case 'checkbox':
           traits.OnOff = { on: el.checked};
@@ -437,28 +457,32 @@ const updateState = (path) => {
 
     // reference to database
     const user = firebase.auth().currentUser;
-
+    let deviceId = "";
     // check user is logged
     if(user){
-      db.ref('users/'+user.uid+'/devices/'+item.id).update({traits});
+      // get device Id
+      deviceId = getId(user,'devices',name.innerText);
+      db.ref('users/'+user.uid+'/devices/'+deviceId).update({traits});
     }else
       console.log("Usuário desconectado.");
-
-  });
   
 }
 
 const renameDevice = (e) => {
   let newName = e.elements[0].value;
-  const device = e.elements[0].id.split('__');
-    
+  const path = e.elements[0].id.split('__');
+  let name = document.getElementById(`${path[0]}__${path[1]}__title`);
+
   // reference to database
   const user = firebase.auth().currentUser;
+  let deviceId = "";
 
   // check user is logged
   if(user){
+    // get device Id
+    deviceId = getId(user,'devices',name.innerText);
     if (newName){
-      db.ref('users/'+user.uid+'/devices/'+device[2]).update({name:newName});
+      db.ref('users/'+user.uid+'/devices/'+deviceId).update({name:newName});
       const reqModal = document.querySelector('.new-request');
       reqModal.classList.remove('open');
     }else
@@ -466,4 +490,113 @@ const renameDevice = (e) => {
   }else
     console.log("Usuário desconectado.");
  
+}
+
+// Move device to another room
+const moveDevice = (item) => {
+  let values = item.id.split('__')
+
+  // reference to database
+  const user = firebase.auth().currentUser
+
+  let collapsible = document.getElementsByClassName(`collapsible`);
+  let collaps = document.getElementsByClassName(`contentColl`); 
+  let name = document.getElementById(`${values[0]}__${values[1]}__title`);
+  let index = 0;
+  let itens = "";
+
+  for ( let i =0; i < collapsible.length; i++ ){
+    for (let j = 0; j < collaps[i].childElementCount; j++) {
+      if(collaps[i].children[j].firstElementChild.firstElementChild.innerText == name.innerText){
+        index = i;
+      }
+    }
+  }
+
+  // check user is logged
+  if(user){
+    let option = 'Enter a new City';
+    let contentForm = `
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+        <input class="mdl-textfield__input" type="text" id="name" required>
+        <label class="mdl-textfield__label" for="name">Name...</label>
+      </div>
+    `;
+
+    itens = modal.getElementsByClassName("mdl-textfield__input");
+    if(values[2] == 'newRoom'){
+      option = 'Choose a new Room';
+      listRoom.sort();
+      contentForm = ` <div class="radios">`;
+
+      listRoom.forEach(room =>{
+        if (room != collapsible[index].innerText){
+          contentForm += ` <input type="radio" name="rGroup" id='${room}'/>
+          <label  class="mdl-list2" for="${room}" id="selectItem">
+              <span>${room}</span>
+          </label>`;
+        }
+      });
+             
+      contentForm += `</div>`;
+      itens = modal.getElementsByClassName("mdl-list2");
+    }
+
+    modal.innerHTML = ` 
+        <h3>${option}</h3>
+        <form action="javascript:;" onsubmit="updateMove(this)" id="${item.id}">
+          ${contentForm}
+        <br><br><button id="btn" style="background-color:#777">${option}</button>
+      </form>
+      <p class="error"></p>
+    `;
+    
+    listConfig(itens);
+  }else
+    console.log("Usuário desconectado.")
+  
+    componentHandler.upgradeAllRegistered();
+};
+
+const updateMove = (element) => {
+  const val = element.id.split('__');
+  const user = firebase.auth().currentUser;
+
+  let name = document.getElementById(`${val[0]}__${val[1]}__title`);
+  let deviceId = "";
+  // get device id
+  deviceId = getId(user,'devices',name.innerText);
+
+  let reqModal = document.querySelector(".new-request");
+  // check user is logged
+  if(user){
+    if(val[2] == 'newCity'){
+      const input = element.querySelector("input");
+      db.ref('users/'+user.uid+'/devices/'+deviceId).update({city:input.value});
+      db.ref('users/'+user.uid+'/actual_city').update({actual:input.value});
+      let cityId = getId(user,'cities', input.value);
+      if(cityId == "")
+        cityId = db.ref('users/'+user.uid+'/cities/').push().key;
+      
+      let updates = {};
+      updates[cityId] = input.value;
+      db.ref('users/'+user.uid+'/cities').update(updates);
+      reqModal.classList.remove('open');
+    }else{
+      const radioChecked = document.querySelector('input[name="rGroup"]:checked');
+      if(radioChecked){
+        let city_name = "";
+        if (cities_name.innerText != "No city")
+          city_name = cities_name.innerText;
+        db.ref('users/'+user.uid+'/devices/'+deviceId).update({roomHint:radioChecked.id, city: city_name});
+        reqModal.classList.remove('open');
+      }else{
+        reqModal.querySelector('.error').textContent = 'Select a room to continue';
+      }
+    }
+
+    componentHandler.upgradeAllRegistered();
+  }else
+    console.log("Usuário desconectado.");
+  
 }

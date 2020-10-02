@@ -1,98 +1,141 @@
 const homeContent = document.querySelector('.item-list');
-
-let rooms = [];
-let cities = [];
+const cities_name = document.getElementById('cities_name');
+const cities_btn_ul = document.getElementById('cities_btn_ul');
 
 /*
  * Handle create layout for home
  */
-const setupHome = data => {
-      data.forEach((devices) => {
-        const values = devices.val();
+const setupHome = (data) => {
+  let collapsible = document.getElementsByClassName(`collapsible`);
 
-        if (!cities.includes(values.city)){
-          cities.push(values.city);
-          rooms.push([]);
+  for (let i = 0; i < collapsible.length; i++) { 
+    let content = document.getElementsByClassName(`contentColl`);  
+      if (collapsible[i].classList.contains('activeColl') == 1){ 
+        content[i].style.maxHeight = "100%";
+      }
+      content[i].innerText = "";
+  }
+
+  let itens = data.child('devices');
+  let actual_city = data.child('actual_city').val();
+  let listCity =  data.child('cities');
+  
+  if(actual_city.actual != "")
+    cities_name.innerText = actual_city.actual;
+  cities_btn_ul.innerHTML = "";
+  // add item menu for cities
+
+  listCity.forEach( (city) => {
+    let ci = `<li id="city" class="mdl-menu__item mdl-button" style="text-transform: none;">${city.val()}</li>`;
+    if(cities_name.innerText != city.val() )
+     cities_btn_ul.insertAdjacentHTML('afterbegin',ci) ;
+  });
+  if(cities_btn_ul.childElementCount > 0)
+    cities_btn_ul.insertAdjacentHTML('beforeend',`<div style="height:1px;width:98%;margin-left:1%;background-color:black;"></div>`) ;
+  cities_btn_ul.insertAdjacentHTML('beforeend', `<li id="addCity" class="mdl-menu__item mdl-button" style="text-transform: none;"><i class="material-icons">add</i> Add another city ...</li>`);
+  
+  if(actual_city.actual != "")
+    cities_btn_ul.insertAdjacentHTML('beforeend', `<li id="removeCity" class="mdl-menu__item mdl-button" style="text-transform: none;"><i class="material-icons">close</i> Remove city</li>`);
+  
+  componentHandler.upgradeAllRegistered();
+
+  itens.forEach((devices) => {
+    const values = devices.val();
+
+    // verify if device city if the same of item menu
+    if(values.city == cities_name.innerText || values.city == ""){
+      let html = ``;
+      let exist = false;
+      let indRoom = 0;
+      let collaps = document.getElementsByClassName(`contentColl`); 
+
+      // check index of room if already exist
+      for (let i = 0; i < collapsible.length; i++) {
+        if (collapsible[i].innerText == values.roomHint){
+          exist = true
+          indRoom = i;
+        }else if ( collapsible[i].innerText == "Assign your device to city" && values.city == ""){
+          exist = true
+          indRoom = i;
+        }else if ( collapsible[i].innerText == "Assign your device to room" && values.roomHint == "" && values.city != ""){
+          exist = true
+          indRoom = i;
         }
-        
-        if(!rooms[cities.indexOf(values.city)].includes(values.roomHint)){
-          rooms[cities.indexOf(values.city)].push(values.roomHint);
+        for (let j = 0; j < collaps[i].childElementCount; j++) {
+          if(collaps[i].children[j].firstElementChild.firstElementChild.innerText == values.name){
+            collaps[i].children[j].remove();
+          }
         }
-        
-        let home = document.getElementById(`collaps${cities.indexOf(values.city)}__title`);
-        let check = false;
-        let r = rooms[cities.indexOf(values.city)];
-        let devicesItems = document.getElementById(`collaps${cities.indexOf(values.city)}__card${r.indexOf(values.roomHint)}__devices`);
-
-        // check home is true
-        if (home){  
-          check = home.classList.contains("activeColl");
-        
-          let content = document.getElementById(`collaps${cities.indexOf(values.city)}`);
-          let room = document.getElementById(`collaps${cities.indexOf(values.city)}__card${r.indexOf(values.roomHint)}__field`);
-
-          if (check){
-            content.style.maxHeight = "100%";
-          }
-
-          let item = document.getElementById(devices.key);
-          if (item){  
-            item.remove();
-          }
-
-          // check room is true
-          if (room){
-            devicesItems.insertAdjacentHTML('beforeend',setupField(cities.indexOf(values.city),r.indexOf(values.roomHint), values, devices.key));
-            componentHandler.upgradeAllRegistered();
-          }else{
-            content.insertAdjacentHTML('beforeend',setHtml(cities, r, values, devices.key));
-            componentHandler.upgradeAllRegistered();
-          }
-
-        }else{
-          let html = setNullHome(cities, r, values, devices);
-
-          homeContent.insertAdjacentHTML('beforeend',html);
-          componentHandler.upgradeAllRegistered();
-        }
-
-      });
-
-      // click casa item ou botao de atualizar os dados
-      let homes = document.getElementsByClassName("collapsible");
-      listItem(homes);
-      let updateButton = document.getElementsByClassName("update");
-      listUpdate(updateButton);
-      let close = document.getElementsByClassName("close");
-      listClose(close);
-      let config = document.getElementsByClassName("config");
-      listConfig(config);
+      }
       
+      // check if room already exist
+      if(exist){;  
+        collaps[indRoom].insertAdjacentHTML('beforeend',setHtml(indRoom, collaps[indRoom].childElementCount, values));
+        
+        componentHandler.upgradeAllRegistered();
+      }else{
+        if(values.city == "")
+        values.roomHint = "Assign your device to city";
+        else if(values.roomHint == "")
+          values.roomHint = "Assign your device to room";
+        html += `<div class="collapsible" id="collaps__title">${values.roomHint}</div>`;
+        html += `<div class="contentColl request-list" id="collaps" >`;
+        html += setHtml(collapsible.length, 0, values);
+        html += `</div>`;
+      }
+     
+      homeContent.insertAdjacentHTML('beforeend',html);
       componentHandler.upgradeAllRegistered();
- 
-};
+        
+    }
 
-const setNullHome = (cities, rooms, values, devices) => {
-  let html =``;
-  html += `<div class="collapsible" id="collaps${cities.indexOf(values.city)}__title">${values.city}</div>`;
-  html += `<div class="contentColl request-list" id="collaps${cities.indexOf(values.city)}" >`;
-  html += setHtml(cities, rooms, values, devices.key);
-  html += `</div>`;
-  return html;
+    componentHandler.upgradeAllRegistered();
+  }); 
+
+  let content = document.getElementsByClassName(`contentColl`); 
+
+  for (let i = collapsible.length-1; i > -1; i--){
+    if(content[i].children.length == 0){
+      collapsible[i].remove();
+      content[i].remove();
+    }
+  }
+
+  // click casa item ou botao de atualizar os dados
+  let collaps = document.getElementsByClassName(`collapsible`);
+  listItem(collaps);
+  let config = document.getElementsByClassName("mdl-button");
+  listConfig(config);
+
 }
 
 // Create cards for devices in home
-const setHtml = (cities, rooms, values, key ) =>{
+const setHtml = (indexRoom, indexDevice, values) =>{
   let html = ``;
-  html += `<li class="mdl-card mdl-shadow--2dp" style="max-width:370px;text-align:left;" id="collaps${cities.indexOf(values.city)}__card${rooms.indexOf(values.roomHint)}__field">`; 
-  html += title(`collaps${cities.indexOf(values.city)}__card${rooms.indexOf(values.roomHint)}`,values.roomHint);
-  html += `<div class="mdl-card__supporting-text" id="collaps${cities.indexOf(values.city)}__card${rooms.indexOf(values.roomHint)}__devices">`;
-  html += setupField(cities.indexOf(values.city),rooms.indexOf(values.roomHint), values, key);
-  html += `</div>`; 
-  html += update(`collaps${cities.indexOf(values.city)}__card${rooms.indexOf(values.roomHint)}`);
-  html += setupClose(cities.indexOf(values.city),rooms.indexOf(values.roomHint));
-  html += setupConfig(cities.indexOf(values.city),rooms.indexOf(values.roomHint));
-  html += `</li>`;
+  html += `<li class="mdl-card mdl-shadow--2dp" style="text-align:left;" id="collaps${indexRoom}__card${indexDevice}__field">`; 
+      html += title(`collaps${indexRoom}__card${indexDevice}`,values.name);
+      html += `<div class="mdl-card__supporting-text" id="collaps${indexRoom}__card${indexDevice}__devices">`;
+      html += `<fieldset class="${values.type}" style="display: flex; flex-direction: column; justify-content: space-between";> `;
+              for( a in values.traits){
+                // verify type and add caracteristics of each device
+                switch(a) {
+                  case "OnOff":
+                    html += OnOff(`collaps${indexRoom}__card${indexDevice}__OnOff`,values.traits.OnOff.on );
+                    break;
+                  case "Brightness":
+                    html += Brightness(`collaps${indexRoom}__card${indexDevice}__Brightness`,values.traits.Brightness.brightness);
+                    break;
+                }
+            }
+             html += `
+          </fieldset>
+        `;
+      html += `</div>`; 
+      html += update(`collaps${indexRoom}__card${indexDevice}`);
+      html += setupClose(indexRoom,indexDevice);
+      html += setupConfig(indexRoom,indexDevice);
+      html += `</li>`;
+
   return html;
 }
 
@@ -168,7 +211,7 @@ const title = (path, name) =>{
 const update = (path) =>{
   const up = `
     <div class="mdl-card__actions mdl-card--border"  >
-        <a id="${path}" class="update mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Update</a>
+        <a id="${path}__update" class="update mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Update</a>
     </div>
   `;
   return up;
@@ -184,7 +227,7 @@ const OnOff = (name,value) => {
     value = "Off";
 
   const l = `
-    <span class="mdl-list__item-sub-title" style="float:right;display: flex; margin-right: 20px;">
+    <span class="mdl-list__item-sub-title" style="margin-top: 10px;">
         <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="${name}" style="width: 50px;"> 
           <input type="checkbox" id="${name}" name="${name}" class="mdl-switch__input" ${checked}>
           <span class="mdl-switch__label">${value}</span>
@@ -197,7 +240,7 @@ const OnOff = (name,value) => {
 // Add item brightness device
 const Brightness = (name,value) => {
   const b = `
-  <span class="mdl-list__item-sub-title" style="float:right;display: flex;">                 
+  <span class="mdl-list__item-sub-title" style="display: flex;margin-top: 10px;">                 
         <input class="mdl-slider mdl-js-slider" type="range" id="${name}" name="${name}" min="0" max="100" value="${value}" step="1">
         ${value}
   </span>
@@ -208,36 +251,11 @@ const Brightness = (name,value) => {
 // Handle remove data from database
 const removeHtml = (button) => {
   let p = button.id.split("__");
-  let fieldsets = document.querySelectorAll(`#${p[0]}__${p[1]}__field fieldset`);
+  let name = document.getElementById(`${p[0]}__${p[1]}__title`);
   let modal = document.querySelector(".modal");
   let html = `
-    <h3>Remove Device</h3>
-    <form>
-    <ul class="demo-list-control mdl-list">
-  `;
-  fieldsets.forEach( (item,index) => {
-    let name = document.getElementById(`${p[0]}__${p[1]}__${item.id}__title`);
-    html+= `
-    <fieldset id="${item.id}">
-      <div class="mdl-list__item mdl-list__item--two-line"  style="margin: 0px;">
-        <span class="mdl-list__item-primary-content" style="max-width:350px;text-align:left;">
-          ${name.textContent}
-        </span>
-        <span class="mdl-list__item-secondary-content" style="float:right;">
-          <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="list-switch-${index}">
-            <input type="checkbox" id="list-switch-${index}" class="mdl-switch__input" />
-          </label>
-        </span>
-      </div>
-    </fieldset>
-    `;
-  });
-
-  html+= `
-    </ul>
-    <p class="error"></p>
-    </form>
-    <button onclick="removeDevice(${p[0]}__${p[1]})">Remove Device</button>
+    <h3>Remove ${name.innerText}</h3>
+    <button onclick="removeDevice('${name.innerText}')">Remove Device</button>
   `;
 
   modal.innerHTML = html;
@@ -251,78 +269,71 @@ const removeHtml = (button) => {
 // Handle configuration device 
 const configHtml = (button) => {
   let p = button.id.split("__");
-  let fieldsets = document.querySelectorAll(`#${p[0]}__${p[1]}__field fieldset`);
   let modal = document.querySelector(".modal");
-  let place = document.getElementById(`${p[0]}__${p[1]}__title`).textContent;
-  let city = document.getElementById(`${p[0]}__title`).textContent;
 
   let html = `
-    <h3>Configuration ${place}</h3>
+    <h3>Configuration </h3>
     <ul class="demo-list-control mdl-list">
   `;
-  fieldsets.forEach( (item,index) => {
-    let name = document.getElementById(`${p[0]}__${p[1]}__${item.id}__title`);
-
+  let collapsible = document.getElementsByClassName(`collapsible`);
+  let collaps = document.getElementsByClassName(`contentColl`); 
+  let name = document.getElementById(`${p[0]}__${p[1]}__title`);
+  let index = 0;
+    
+    for ( let i =0; i < collapsible.length; i++ ){
+      for (let j = 0; j < collaps[i].childElementCount; j++) {
+        if(collaps[i].children[j].firstElementChild.firstElementChild.innerText == name.innerText){
+          index = i;
+        }
+      }
+    } 
     // create html rooms for move device
     let moveButton = ``;
-    let r = rooms[cities.indexOf(city)];
-    r.forEach( (room, i) =>{
-        if(room != place){
-          if (i == r.length-2)
-            if(r[r.length-1] == place)
-              moveButton+= `<li class="mdl-menu__item mdl-menu__item--full-bleed-divider" id='${p[0]}__${p[1]}__${item.id}__${room}'>${room} </li>`;
-            else
-              moveButton+=`<li class="mdl-menu__item" id='${p[0]}__${p[1]}__${item.id}__${room}'>${room} </li>`;
-          
-          else if (i == r.length-1)
-            moveButton+= `<li class="mdl-menu__item mdl-menu__item--full-bleed-divider" id='${p[0]}__${p[1]}__${item.id}__${room}'>${room} </li>`;
-          else
-            moveButton+=`<li class="mdl-menu__item" id='${p[0]}__${p[1]}__${item.id}__${room}'>${room} </li>`;
-      }
-
-    });
-    moveButton+= `<li class="mdl-menu__item" id='${p[0]}__${p[1]}__${item.id}__newCity'>Add new City</li>`;
-    moveButton+=`<li class="mdl-menu__item" id='${p[0]}__${p[1]}__${item.id}__newRoom'>Add new Room </li>`;
-
+    //if(collapsible[index].innerText != "Assign your device to room" ){
+      moveButton+= `<li class="mdl-menu__item mdl-button" style="text-transform: none;" id='${p[0]}__${p[1]}__newCity'>Add new City</li>`;
+    //}
+    if(collapsible[index].innerText != "Assign your device to city"){
+      moveButton+=`<li class="mdl-menu__item mdl-button" style="text-transform: none;" id='${p[0]}__${p[1]}__newRoom'>Add new Room </li>`;
+    }
     html+= `
-    <fieldset id="${item.id}">
-      <div class="mdl-list__item mdl-list__item--two-line"  style="margin: 0px;">
+    <fieldset>
+      <div class="mdl-list__item mdl-list__item--two-line mdl-layout__header--waterfall"  style="margin: 0px;">
         <span class="mdl-list__item-primary-content" style="max-width:350px;text-align:left;">
           ${name.textContent}
         </span>
         <span class="mdl-list__item-secondary-content">
           <form  action="javascript:;" onsubmit="renameDevice(this)">
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable" >
-              <label class="mdl-button mdl-js-button mdl-button--icon" for="${p[0]}__${p[1]}__${item.id}__rename" id='${p[0]}__${p[1]}__${item.id}__rename_id'>
+          
+            <div class="android-search-box mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right mdl-textfield--full-width">
+              <label class="mdl-button mdl-js-button mdl-button--icon" for="${p[0]}__${p[1]}__rename" id='${p[0]}__${p[1]}__rename_id'>
                 <i class="material-icons">create</i>
               </label>
               <div class="mdl-textfield__expandable-holder">
-                <input class="mdl-textfield__input" type="text" id="${p[0]}__${p[1]}__${item.id}__rename">
+                <input class="mdl-textfield__input" type="text" id="${p[0]}__${p[1]}__rename">
                 <label class="mdl-textfield__label" for="sample-expandable">Expandable Input</label>
               </div>
-              <div class="mdl-tooltip" data-mdl-for="${p[0]}__${p[1]}__${item.id}__rename_id">
+              <div class="mdl-tooltip" data-mdl-for="${p[0]}__${p[1]}__rename_id">
                 Rename
               </div>
             </div>
           </form>
         </span>
         <span class="mdl-list__item-secondary-content">
-          <button id="${p[0]}__${p[1]}__${item.id}__forward"
+          <button id="${p[0]}__${p[1]}__forward"
                   class="mdl-button mdl-js-button mdl-button--icon">
             <i class="material-icons">forward</i>
           </button>
           <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect"
-              for="${p[0]}__${p[1]}__${item.id}__forward">
+              for="${p[0]}__${p[1]}__forward">
               ${moveButton}
           </ul>
-          <div class="mdl-tooltip" data-mdl-for="${p[0]}__${p[1]}__${item.id}__forward">
+          <div class="mdl-tooltip" data-mdl-for="${p[0]}__${p[1]}__forward">
             Move
           </div>
         </span>
       </div>
     </fieldset>
     `;
-  });
   html+= `
     </ul>
   `;
@@ -333,6 +344,6 @@ const configHtml = (button) => {
 
   componentHandler.upgradeAllRegistered();
   
-  let menuItem = document.getElementsByClassName("mdl-menu__item");
-  moveDevice(menuItem);
+  let config = document.getElementsByClassName("mdl-button");
+  listConfig(config);
 }
