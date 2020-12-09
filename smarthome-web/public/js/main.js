@@ -68,9 +68,9 @@ const click = function() {
   this.classList.toggle("activeColl");
   var content = this.nextElementSibling;
   if (content.style.maxHeight){
-    content.style.maxHeight = null;
+      content.style.maxHeight = null;
   } else {
-    content.style.maxHeight = "100%";
+    content.style.maxHeight = content.scrollHeight+"px";
   } 
 }
 
@@ -373,22 +373,23 @@ const addDevice = () => {
           n= n + i;
           pkg[id] = {traits,type:'action.devices.types.SWITCH',name:n,roomHint:"",city:""};
           let p = 'path'+i;
-          pkgPath[p] = user.uid+'/devices/'+id
+          pkgPath[p] = id
         }else{
           pkg[id] = {traits,type:'action.devices.types.'+typeDevice,name:n,roomHint:"",city:""};
           let p = 'path'+i;
-          pkgPath[p] = user.uid+'/devices/'+id
+          pkgPath[p] = id
         }
       }
+      pkgPath["user"] = user.uid;
   
       // update path device to database
-      //db.ref('devices-path/'+deviceId).update(pkgPath);
+      db.ref('devices-path/'+deviceId).update(pkgPath);
 
       // add new device to database
-      //db.ref('users/'+user.uid+'/devices/').update(pkg);
+      db.ref('users/'+user.uid+'/devices/').update(pkg);
   
       // remove device in available devices
-      //db.ref('available-devices/'+devicePos).remove();
+      db.ref('available-devices/'+devicePos).remove();
       
       requestForm.reset();
       requestForm.querySelector('.error').textContent = "";
@@ -396,11 +397,9 @@ const addDevice = () => {
   
     }else{
       requestForm.querySelector('.error').textContent = "Usuário não conectado!";
-  
     }
   
   };
-
 
 // Handle remove device
 const removeDevice = (name) => {
