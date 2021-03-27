@@ -344,6 +344,11 @@ app.onSync( async(body, headers) => {
             'action.devices.traits.OnOff',
           ];
           break;
+        case 'action.devices.types.SECURITYSYSTEM':
+            trait = [
+              "action.devices.traits.ArmDisarm",    
+            ];
+            break;
       }
       
       let item = {
@@ -402,6 +407,13 @@ const queryFirebase = async (deviceId) => {
         type: snapshotVal.type,
       };
         break;
+        case 'action.devices.types.SECURITYSYSTEM':
+          data = {
+            isArmed: snapshotVal.traits.ArmDisarm.isArmed,
+            currentArmLevel: snapshotVal.traits.ArmDisarm.currentArmLevel,
+            type: snapshotVal.type,
+          };
+            break;
   }
 
   return data;
@@ -424,6 +436,12 @@ const queryDevice = async (deviceId) => {
         on: data.on,
       };
       break;
+    case 'action.devices.types.SECURITYSYSTEM':
+        dataDevice = {
+          "isArmed": data.isArmed,
+          "currentArmLevel": data.currentArmLevel,
+        };
+        break;
   }
 
   return dataDevice;
@@ -480,6 +498,10 @@ const updateDevice = async (execution, deviceId) => {
       state = {isPaused: params.pause};
       ref = firebaseRef.child(deviceId+"/traits").child('StartStop');
       break;
+      case 'action.devices.commands.ArmDisarm':
+        state = {isArmed: params.arm};
+        ref = firebaseRef.child(deviceId+"/traits").child('ArmDisarm');
+        break;
   }
 
   return await ref.update(state)
