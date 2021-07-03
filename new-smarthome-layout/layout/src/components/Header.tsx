@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import '../styles/header.scss';
 
@@ -10,12 +11,13 @@ type HeaderProps = {
 }
 
 export function Header( props:HeaderProps) {
-
+    const history = useHistory();
     const { logout } = useAuth()
 
     async function handleLogout (){
         await logout()
         localStorage.removeItem('logged')
+        history.push('/auth')
     }
 
     return (

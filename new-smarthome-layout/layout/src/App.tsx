@@ -8,24 +8,18 @@ import { AuthContextProvider } from './contexts/AuthContext';
 function App(){
 
   const isLogged = localStorage.getItem("logged") === 'true'
-  console.log(isLogged, typeof(isLogged))
+
   return (
     <BrowserRouter>
       <AuthContextProvider>
         <Switch>
           <Route path="/" exact render={() => (
+            isLogged ? 
+            <Redirect to="feed"/>:
             <Redirect to="/auth"/> 
           )} />
-          <Route path="/auth" component={Auth} render={() => (
-            isLogged &&
-              (<Route path="/feed" component={Feed} /> )
-          )}/>
+          <Route path="/auth" component={Auth} />
           <Route path="/feed" component={Feed} /> 
-          {/* render={() => (
-            !isLogged ?
-            <Redirect to='/auth' />:
-              <Route path="/feed" component={Feed} />
-          )} /> */}
         </Switch>
       </AuthContextProvider>
     </BrowserRouter>

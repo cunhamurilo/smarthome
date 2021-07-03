@@ -1,4 +1,7 @@
 #page-feed {
+    display: flex;
+    flex-direction: column;
+
     main {
         background:white;
         display: flex;
@@ -10,7 +13,18 @@
 
     .main-content {
         max-width: 1200px;
+        min-width: 400px;
         background:#EEEEEE;
         width:100%;
+        display:flex;
+        flex-wrap: wrap;
+    }
+}
+
+@media (min-width: 800px) {
+    #page-feed {
+        .main-content {
+            max-width: 400px;
+        }
     }
 }

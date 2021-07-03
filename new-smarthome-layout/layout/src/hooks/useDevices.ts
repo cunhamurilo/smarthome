@@ -1,7 +1,16 @@
 import { useEffect, useState } from "react";
 
 import { database } from "../services/firebase";
-import { useAuth } from "./useAuth";
+
+type FirebaseDevices = Record<string, {
+  city: string | undefined;
+  name: string;
+  roomHint: string | undefined;
+  traits: Record<string, {
+    output: string;
+  }>
+  type: string;
+}>
 
 type DeviceType = {
   id: string;
@@ -14,39 +23,41 @@ type DeviceType = {
   type: string;
 }
 
-export function useDevices(city: string, user_id:string) {
+type DeviceParams = {
+  city: string;
+  user_id:string | undefined;
+}
+
+export function useDevices( props: DeviceParams) {
   const [devices, setDevices] = useState<DeviceType[]>([])
-  const [title, setTitle] = useState('');
-
-//   console.log(user_id)
+  
   useEffect(() => {
-    const deviceRef = database.ref(`users/xKYUPWAUIFNh3YzvmkJmLp2VbgC2/devices/`);
+    if(props.user_id){
+      const deviceRef = database.ref(`users/${props.user_id}/devices/`);
 
-    deviceRef.on('value', device => {
-        // console.log(device)
-    //   const databaseRoom = room.val();
-    //   const firebaseQuestions: FirebaseQuestions = databaseRoom.questions ?? {};
+      deviceRef.on('value', device => {
+        const databaseDevices = device.val();
+        
+        const firebaseDevices: FirebaseDevices = databaseDevices ?? {};
+        const parsedDevices = Object.entries(firebaseDevices).filter(([key, value]) => value.city === props.city || value.city === "").map(([key, value]) => {
+            return {
+              id: key,
+              city: value.city,
+              name: value.name,
+              roomHint: value.roomHint,
+              traits: value.traits,
+              type: value.type,
+            }
+        })
 
-    //   const parsedQuestions = Object.entries(firebaseQuestions).map(([key, value]) => {
-    //     return {
-    //       id: key,
-    //       content: value.content,
-    //       author: value.author,
-    //       isHighlighted: value.isHighlighted,
-    //       isAnswered: value.isAnswered,
-    //       likeCount: Object.values(value.likes ?? {}).length,
-    //       likeId: Object.entries(value.likes ?? {}).find(([key, like]) => like.authorId === user?.id)?.[0],
-    //     }
-    //   })
-
-    //   setTitle(databaseRoom.title);
-    //   setQuestions(parsedQuestions);
-    })
-
-    return () => {
-      deviceRef.off('value');
+        setDevices(parsedDevices);
+      })
+      
+      return () => {
+        deviceRef.off('value');
+      }
     }
-  }, [city, user_id]);
+  }, [props.city, props.user_id]);
 
-  return { devices, title }
+  return { devices }
 }

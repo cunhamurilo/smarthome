@@ -1,22 +1,22 @@
-// import { useEffect } from "react";
-
 import { useAuth } from '../hooks/useAuth';
-// import { database } from '../services/firebase';
 import { Header } from '../components/Header';
 
 import '../styles/feed.scss';
+import { useHistory } from 'react-router-dom';
+import { useDevices } from '../hooks/useDevices';
+import { Card } from '../components/Card/Card';
 // import { CityContextProvider } from '../contexts/CityContext';
 
-import { useDevices } from '../hooks/useDevices';
-import { useHistory } from 'react-router-dom';
 
 export function Feed() {
     const { user } = useAuth()
     const history = useHistory();
-
-    console.log(user)
-    //const { title, devices } = useDevices("São carlos",'xKYUPWAUIFNh3YzvmkJmLp2VbgC2')
     
+    const isLogged = localStorage.getItem("logged") === 'true'
+    if(!isLogged)
+      history.push('/auth')
+
+    const { devices } = useDevices({city:"São Carlos",user_id:user?.id} )
 
     return (
       <div id="page-feed">
@@ -26,7 +26,10 @@ export function Feed() {
           <main>
             { user &&
               <div className="main-content">
-              teste
+                { devices.map(device => {
+                  return <Card  key={device.id} name={device.name} traits={device.traits}  type="" city={device.city} roomHint={device.roomHint} />
+                
+                } )}
               </div>
             }
           </main>

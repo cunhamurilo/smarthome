@@ -1,4 +1,5 @@
 import { useState, FormEvent } from 'react';
+import { useHistory } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { useAuth } from '../hooks/useAuth';
 
@@ -6,10 +7,16 @@ import '../styles/auth.scss';
 
 export function Auth() {
   
+    const history = useHistory();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const { signInWithGoogle, signInWithEmailAndPassword } = useAuth()
+
+  
+    const isLogged = localStorage.getItem("logged") === 'true'
+    if(isLogged)
+      history.push('/feed')
 
     async function handleLoginEmailAndPassword(event: FormEvent) {
         event.preventDefault();
@@ -17,15 +24,25 @@ export function Auth() {
         const result = await signInWithEmailAndPassword(email, password);
         if(result !== "Logged"){
           setError(result)
-        }else
+        }else{
+          console.log(result)
           setError("")
+          history.push('/feed')
+        }
     }
 
     async function handleLoginGoogle(event: FormEvent) {
         event.preventDefault();
 
-        await signInWithGoogle();
-    }
+        const result = await signInWithGoogle();
+        if(result !== "Logged"){
+          setError(result)
+        }else{
+          console.log(result)
+          setError("")
+          history.push('/feed')
+        }
+     }
 
     return (
       <div id="page-auth">
@@ -37,7 +54,7 @@ export function Auth() {
             <form onSubmit={handleLoginEmailAndPassword}>
                 <input type="text" placeholder="Email" 
                 onChange={event => setEmail(event.target.value)}/>
-                <input type="text" placeholder="Password" 
+                <input type="password" placeholder="Password" 
                 onChange={event => setPassword(event.target.value)}/>
 
                 <Button type="submit">

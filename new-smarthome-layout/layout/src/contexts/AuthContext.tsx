@@ -2,7 +2,6 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 import { auth, firebase } from "../services/firebase";
 
 import ProfileImg from '../assets/images/profile_placeholder.png';
-import { useHistory } from "react-router-dom";
 
 type User = {
   id: string;
@@ -12,7 +11,7 @@ type User = {
 
 type AuthContextType = {
   user: User | undefined;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: () => Promise<string>;
   signInWithEmailAndPassword: (email: string, password:string) => Promise<string>;
   logout: () => Promise<void>;
 }
@@ -25,7 +24,6 @@ export const AuthContext = createContext({} as AuthContextType);
 
 export function AuthContextProvider(props: AuthContextProviderProps) {
   const [user, setUser] = useState<User>();
-  const history = useHistory();
 
   useEffect( () => {
     const unsubscribe = auth.onAuthStateChanged(user => {
@@ -45,9 +43,6 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
         })
 
         localStorage.setItem('logged', 'true');
-        // history.push('/feed')
-      }else{
-        // history.push('/auth')
       }
     })
     
@@ -59,25 +54,33 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
   async function signInWithGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
 
-    const result = await auth.signInWithPopup(provider);
+    const resp = await auth.signInWithPopup(provider)
+    .then((result) => {
 
-    if (result.user) {
-      const { displayName, photoURL, uid } = result.user
+      if (result.user) {
+        const { displayName, photoURL, uid } = result.user
 
-      if (!displayName || !photoURL) {
-        throw new Error('Missing information from Google Account.');
-      }
+        if (!displayName || !photoURL) {
+          throw new Error('Missing information from Google Account.');
+        }
 
-      setUser({
-        id: uid,
-        name: displayName,
-        avatar: photoURL
-      })
-    }
+        setUser({
+          id: uid,
+          name: displayName,
+          avatar: photoURL
+        })
+        return "Logged"
+      }})
+      .catch((error) => {
+        // var errorCode = error.code;
+        var errorMessage = error.message;
+        return errorMessage;
+      });
+      return resp
   }
 
   async function signInWithEmailAndPassword(email:string, password:string) {
-    const provider = auth.signInWithEmailAndPassword(email, password)
+    const resp = auth.signInWithEmailAndPassword(email, password)
     .then((result) => {
       if (result.user) {
         let { displayName, photoURL, uid } = result.user
@@ -101,7 +104,7 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
       var errorMessage = error.message;
       return errorMessage;
     });
-    return provider
+    return resp
   }
 
   async function logout() {
