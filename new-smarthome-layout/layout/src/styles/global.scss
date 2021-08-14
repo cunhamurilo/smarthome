@@ -1,3 +1,5 @@
+@import '~react-pro-sidebar/dist/scss/styles.scss';
+
 * {
     margin: 0;
     padding: 0;
@@ -13,3 +15,95 @@
     font: 400 16px 'Roboto', sans-serif;
     font-family: 'Roboto', sans-serif;
   }
+
+  .App {
+    display:flex;
+    height:100vh;
+
+    .toggle {
+      display:none;
+      justify-content: space-between;
+      align-items: center;
+      width:100%;
+    
+      .btn-toggle {
+        cursor: pointer;
+        margin-left: 16px;
+        width: 35px;
+        height: 35px;
+        background: orange;
+        color: #fff;
+        text-align: center;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        display: flex;
+      }
+
+      .btn-toggle:hover {
+          opacity:0.7;
+          background-color:orange;
+      }
+    }
+
+    .pro-sidebar > .pro-sidebar-inner {
+      background-color:white;
+
+      .pro-inner-item {
+        margin-left:20px;
+        color:black;
+      }
+
+      
+      .pro-sidebar-content {
+        .pro-inner-item {
+          background-color:white;
+          border-radius: 24px 0 0 24px;
+        }
+      }
+    }
+
+    .main-app { 
+      width:100%;
+      height: 100%;
+      overflow-y: scroll; 
+    }
+
+  }
+
+  .pro-sidebar .pro-menu.shaped .pro-menu-item > .pro-inner-item > .pro-icon-wrapper{
+    background: none;
+    color:black;
+  }
+
+  .pro-sidebar .overlay {
+    width:100%;
+  }
+  
+  .pro-sidebar.collapsed {
+    padding: 12px 0 12px 12px;
+    min-width: 100px;
+    // width: 100px;
+  }
+
+@media (min-width: $breakpoint-lg){
+  .pro-sidebar.lg.toggled .overlay {
+    display:flex;
+  }
+}
+
+@media (max-width: $breakpoint-lg) {
+  
+  .App {
+    flex-direction: column;
+    
+    .pro-sidebar.lg.collapsed {
+      left: -100px;
+    }
+    .toggle {
+      display: flex;
+    }
+  }
+}
