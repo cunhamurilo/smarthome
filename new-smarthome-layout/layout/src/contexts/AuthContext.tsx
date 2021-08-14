@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useEffect, useState } from "react";
+import { createContext, ReactNode, useEffect, Dispatch, SetStateAction } from "react";
 import { auth, firebase } from "../services/firebase";
 
 import ProfileImg from '../assets/images/profile_placeholder.png';
@@ -17,13 +17,14 @@ type AuthContextType = {
 }
 
 type AuthContextProviderProps = {
+  user: User;
+  setUser:  Dispatch<SetStateAction<User>>;
   children: ReactNode;
 }
 
 export const AuthContext = createContext({} as AuthContextType);
 
-export function AuthContextProvider(props: AuthContextProviderProps) {
-  const [user, setUser] = useState<User>();
+export function AuthContextProvider({user, setUser, ...props}: AuthContextProviderProps) {
 
   useEffect( () => {
     const unsubscribe = auth.onAuthStateChanged(user => {
@@ -32,7 +33,7 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
 
         if (!displayName || !photoURL) {
             // throw new Error('Missing information from auth.');
-            displayName = "User wihtout name"
+            displayName = "User without name"
             photoURL = ProfileImg
         }
 
@@ -42,14 +43,19 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
           avatar: photoURL
         })
 
-        localStorage.setItem('logged', 'true');
+      }else{
+        setUser({
+          id: 'null',
+          name: 'null',
+          avatar: 'null'
+        })
       }
     })
     
     return () => {
       unsubscribe();
     }
-  }, [])
+  }, [setUser])
 
   async function signInWithGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
@@ -69,7 +75,6 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
           name: displayName,
           avatar: photoURL
         })
-        return "Logged"
       }})
       .catch((error) => {
         // var errorCode = error.code;

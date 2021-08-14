@@ -1,7 +1,55 @@
-.card-content {
-    min-width: 350px;
-    min-height: 150px;
-    // background:red;
-    padding:8px;
-    border: 1px solid black;
+.card-container {
+    width: 360px;
+    max-width: 360px;
+    min-height: 140px;
+    background:white;
+    margin:20px;
+    border-radius: 8px;
+    // grid-column: span 1;
+    // grid-row: span 1;
+
+    .card-header {
+        display:flex;
+        padding:16px;
+
+        .card-title{
+            flex:4;
+            font-size: 28px;
+        }
+        .card-buttons {
+            flex:1;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        }
+        .card-buttons-click{
+            cursor: pointer;
+        }
+    }
+
+    .separator{
+        height: 1px;
+        margin:0px;
+        background:#e0e0e0;
+    }
+
+    .card-content {
+        color:black;
+        padding: 20px;
+
+        .MuiSwitch-colorSecondary.Mui-checked, .MuiSlider-root {
+            color:orange;
+        }
+
+        .MuiSwitch-colorSecondary.Mui-checked + .MuiSwitch-track {
+            background-color: orange;
+        }
+
+    }
 }
+
+.bigger {
+	grid-row: span 2;
+    // grid-column: span 1;
+}
+

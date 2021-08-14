@@ -1,0 +1,103 @@
+.dashboard-header {
+    display:flex;
+    width: 100%;
+    max-width: 1200px;
+    align-items:center;
+    margin-bottom: 16px;
+
+    .dashboard-title {
+        flex: 1;
+        font-size: 48px;
+        padding:8px;
+    }
+
+    .dashboard-list-city {
+        flex:1;
+        font-size: 28px;
+        display:flex;
+        align-items:center;
+        justify-content: flex-end;
+
+        .dashboard-list-city-selected {
+            margin-right: 8px;
+        }
+
+        .dashboard-list-city-container {
+            position: relative;
+            display: inline-block;
+
+            .button {
+                padding: 0;
+                background-color: #fff;
+                color: #333;
+                cursor: pointer;
+                border-radius: 20px;
+                height:auto;
+            }     
+                        
+            .dropdown {
+                position: absolute;
+                top: 100%;
+                left: 0px;
+                width: 200px;
+                font-size: 20px;
+                z-index: 2;
+                background-color: white;
+                border: 1px solid rgba(0, 0, 0, 0.04);
+                // box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14);
+                .separator-city {
+                    height: 1px;
+                    width: 100%;
+                    background-color:#e0e0e0;
+                }
+            }
+            
+            ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            li {
+                padding: 8px 12px;
+            }
+            
+            li:hover {
+                background-color: rgba(0, 0, 0, 0.14);
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+
+@media (max-width: 1650px) {
+    .dashboard-header {
+        .dashboard-list-city {
+            .dashboard-list-city-container {
+                .dropdown {
+                    left: -172px;
+                }
+            }
+        }
+    }
+}
+
+
+@media (max-width: 1250px) {
+    .dashboard-header {
+        max-width: 800px;
+    }
+}
+
+@media (max-width: 900px) {
+    .dashboard-header {
+        max-width: 500px;
+    }
+}
+
+@media (max-width: 560px) {
+    .dashboard-header {
+        max-width: 450px;
+    }
+}

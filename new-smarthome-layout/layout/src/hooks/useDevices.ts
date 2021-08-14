@@ -5,10 +5,12 @@ import { database } from "../services/firebase";
 type FirebaseDevices = Record<string, {
   city: string | undefined;
   name: string;
-  roomHint: string | undefined;
-  traits: Record<string, {
-    output: string;
-  }>
+  roomHint: string | "";
+  traits: {
+    OnOff?: {on:boolean};
+    Brightness?: {brightness:number};
+    ArmDisarm?: {isArmed:boolean};
+  };
   type: string;
 }>
 
@@ -16,10 +18,12 @@ type DeviceType = {
   id: string;
   city: string | undefined;
   name: string;
-  roomHint: string | undefined;
-  traits: Record<string, {
-    output: string;
-  }>
+  roomHint: string | "";
+  traits: {
+    OnOff?: {on:boolean};
+    Brightness?: {brightness:number};
+    ArmDisarm?: {isArmed:boolean};
+  };
   type: string;
 }
 

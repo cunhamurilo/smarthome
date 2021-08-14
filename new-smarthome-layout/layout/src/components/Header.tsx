@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import '../styles/header.scss';
 
+import { MdRefresh } from 'react-icons/md';
 
 type HeaderProps = {
     avatar: string | undefined;
@@ -27,15 +28,20 @@ export function Header( props:HeaderProps) {
     >
          <div className="header-content">
           <div className="logo">
-            <p>Smart Home Codelab</p>
-            <button className="mdl-button mdl-js-button mdl-button--icon" id='request-sync'>refresh</button>
+            <span>Smart Home Codelab</span>
+            <MdRefresh size={28} className="refresh-home"/>
           </div>
           <div className="user-content">
-            <img src={props.avatar} alt="" />
-            <span>{props.name}</span>
-            <button onClick={handleLogout}>Exit</button>
+            {
+            props.avatar &&
+              <>
+                <img src={props.avatar} alt="" />
+                <span>{props.name}</span>
+                <button onClick={handleLogout}>Exit</button>
+              </>
+            }
           </div>
-          </div>
+        </div>
     </header>
   )
 }

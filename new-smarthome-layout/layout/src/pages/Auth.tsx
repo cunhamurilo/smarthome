@@ -1,5 +1,4 @@
-import { useState, FormEvent } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useState, FormEvent, SyntheticEvent } from 'react';
 import { Button } from '../components/Button';
 import { useAuth } from '../hooks/useAuth';
 
@@ -7,30 +6,25 @@ import '../styles/auth.scss';
 
 export function Auth() {
   
-    const history = useHistory();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const { signInWithGoogle, signInWithEmailAndPassword } = useAuth()
-
   
-    const isLogged = localStorage.getItem("logged") === 'true'
-    if(isLogged)
-      history.push('/feed')
-
-    async function handleLoginEmailAndPassword(event: FormEvent) {
+    // function get email and password for login
+    async function handleLoginEmailAndPassword(event: SyntheticEvent) {
         event.preventDefault();
-
+        const target = event.target as typeof event.target & {
+          email: { value: string };
+          password: { value: string };
+        };
+        const email = target.email.value;
+        const password = target.password.value;
         const result = await signInWithEmailAndPassword(email, password);
-        if(result !== "Logged"){
+
+        if(result !== "Logged")
           setError(result)
-        }else{
-          console.log(result)
-          setError("")
-          history.push('/feed')
-        }
     }
 
+    // function that get click in google button
     async function handleLoginGoogle(event: FormEvent) {
         event.preventDefault();
 
@@ -40,7 +34,6 @@ export function Auth() {
         }else{
           console.log(result)
           setError("")
-          history.push('/feed')
         }
      }
 
@@ -52,13 +45,11 @@ export function Auth() {
             <strong>Login</strong>
 
             <form onSubmit={handleLoginEmailAndPassword}>
-                <input type="text" placeholder="Email" 
-                onChange={event => setEmail(event.target.value)}/>
-                <input type="password" placeholder="Password" 
-                onChange={event => setPassword(event.target.value)}/>
+                <input type="text" name="email" placeholder="Email" />
+                <input type="password" name="password" placeholder="Password" />
 
                 <Button type="submit">
-                Login
+                  Login
                 </Button>
             </form>
             <div className="separator">or</div>
