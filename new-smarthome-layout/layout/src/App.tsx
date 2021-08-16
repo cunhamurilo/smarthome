@@ -8,7 +8,6 @@ import { useState } from 'react';
 
 import { AuthContextProvider } from './contexts/AuthContext';
 
-import { FaBars } from 'react-icons/fa';
 
 type User = {
   id: string;
@@ -33,14 +32,12 @@ function App(){
       if(from !== 'feed')
         return <Redirect to="feed"/>
       else
-        return <Feed />;
+        return <Feed handleToggleSidebar={handleToggleSidebar}/>;
     }
   }
-  
  
   // função que ativao side bar
   function handleToggleSidebar (value:boolean) {
-    console.log(value)
     setToggled({toggled:value, collapsed:value? false:true});
   }
 
@@ -59,18 +56,11 @@ function App(){
               <div className="App">
               { 
               (user.id !== 'null' && user.id !== '') &&
-                <>
-                  <SlideBar 
-                    toggled={toggled.toggled}
-                    collapsed={toggled.collapsed}
-                    handleToggleSidebar={handleToggleSidebar}
-                  />
-                  <div className="toggle">     
-                    <div className="btn-toggle" onClick={() => handleToggleSidebar(true)}>
-                      <FaBars />
-                    </div>
-                  </div>
-                </>
+                <SlideBar 
+                  toggled={toggled.toggled}
+                  collapsed={toggled.collapsed}
+                  handleToggleSidebar={handleToggleSidebar}
+                />
               }
               <main className="main-app">  
                 <Route exact path="/feed"  > 

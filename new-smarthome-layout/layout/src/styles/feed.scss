@@ -1,14 +1,44 @@
+@import '~react-pro-sidebar/dist/scss/styles.scss';
+
 #page-feed {
     display: flex;
     flex-direction: column;  
-    background:white;
-    padding: 24px;
+    background:white; 
+    height: 100%;
+    padding: 24px 0 0 24px;
 
     header {
         display:flex;
         align-items:center; 
-        background:red;
-        flex-wrap:wrap;
+        // flex-wrap:wrap;
+        
+        .toggle {
+            display:none;
+            justify-content: space-between;
+            align-items: center;
+            width:100%;
+        
+            .btn-toggle {
+                cursor: pointer;
+                // margin-left: 16px;
+                width: 35px;
+                height: 35px;
+                background: orange;
+                color: #fff;
+                text-align: center;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 15px;
+                display: flex;
+            }
+    
+            .btn-toggle:hover {
+                opacity:0.7;
+                background-color:orange;
+            }
+        }
 
         .search {
             flex:1;
@@ -35,22 +65,68 @@
 
             input[type=search]:focus {
                 background-color: #fff;
-                border-color: #0A65FF;
+                border-color: orange;
                 
                 -webkit-box-shadow: 0 0 5px rgba(109,207,246,.5);
                 -moz-box-shadow: 0 0 5px rgba(109,207,246,.5);
                 box-shadow: 0 0 5px rgba(109,207,246,.5);
             }
         }
+
         .user-info {
-            // flex:1;
             display:flex;
             align-items:center;
-            margin-left: 12px;
+            padding:8px;
+            margin-right: 20px;
 
-            .user {
-                margin-left: 12px;
+            .settings {
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                cursor: pointer;
+                width: 40px;
+                height: 40px;
+                border-radius: 20px;
+
+                .icon-setttings {
+                    width: 28px;
+                    height: 28px;
+                }
             }
+
+            .settings:hover {
+                background-color: #DAE1EC;
+            }
+
+            .user-image {
+                img {
+                    width: 28px;
+                    height: 28px;
+                }
+            }
+
+            .user-name, .user-image {
+                margin-left: 20px;
+            }
+        }
+    }
+
+    .main {
+        display: flex;
+        margin-top: 20px;
+        height: 100%;
+
+        .central {
+            flex:2;
+            text-align: center;
+        }
+
+        .right {
+            flex:1;
+            text-align: center;
+            height: 100%;
+            background-color: #F8F8F8;
+            border-top-left-radius: 20px;
         }
     }
 
@@ -105,7 +181,6 @@
     }
 }
 
-
 @media (max-width: 900px) {
     #page-feed {
         main{
@@ -117,6 +192,50 @@
                         flex-wrap: wrap;
                         justify-content: center;
                     }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: $breakpoint-lg) {
+    #page-feed {
+        padding: 12px 0 0 12px;
+        header {
+            .toggle {
+                display: flex;
+                flex: 0;
+            }
+            
+            .search {
+                margin-left: 20px;
+            }
+
+            .user-info {
+                margin-right: 8px;
+
+                .settings {
+                    width: 32px;
+                    height: 32px;
+                    .icon-setttings{
+                        width: 20px;
+                        height: 20px;
+                    }
+                }
+        
+                .user-image {
+                    img {
+                        width: 20px;
+                        height: 20px;
+                    }
+                }
+    
+                .user-name {
+                    margin-left: 12px;
+                }
+
+                .user-image {
+                    display: none;
                 }
             }
         }

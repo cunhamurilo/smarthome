@@ -1,4 +1,4 @@
-import { SyntheticEvent, useState, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 
 import { ProSidebar} from 'react-pro-sidebar';
 import { useHistory, useLocation } from "react-router-dom";
@@ -37,17 +37,17 @@ export default function SlideBar({ toggled, collapsed, handleToggleSidebar }:Sli
     function menuClickButton(event: FormEvent){
         const idMenuItem = event.currentTarget.id
 
-        setMenuState(idMenuItem)
         const indexMenu = menus.findIndex((menu) => menu.toLowerCase() === idMenuItem.toLowerCase())
-        if(indexMenu > -1)
+        if(indexMenu > -1){
             history.push(urls[indexMenu])
-        else{
+            setMenuState(idMenuItem)
+        }else{
             if(idMenuItem === 'Logout')
                 console.log(idMenuItem)
             else if(idMenuItem === 'Home')
                 console.log(idMenuItem)
         }
-        // handleToggleSidebar(false);
+        handleToggleSidebar(false);
     }
 
     return (
@@ -56,7 +56,7 @@ export default function SlideBar({ toggled, collapsed, handleToggleSidebar }:Sli
             toggled={toggled}
             collapsed={collapsed}
             onToggle={handleToggleSidebar}
-            style={{backgroundColor: 'white'}}//, minWidth: '100px', padding: '12px 0 12px 12px'}}
+            style={{backgroundColor: 'white'}}
         >
             
             <div className="slide-bar">

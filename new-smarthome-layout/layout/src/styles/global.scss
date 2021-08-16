@@ -16,37 +16,28 @@
     font-family: 'Roboto', sans-serif;
   }
 
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    // background: #888;
+    background: orange;
+    border-radius: 8px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    // background: #555;
+    background: #FFCC00;
+  } 
+
   .App {
     display:flex;
     height:100vh;
-
-    .toggle {
-      display:none;
-      justify-content: space-between;
-      align-items: center;
-      width:100%;
-    
-      .btn-toggle {
-        cursor: pointer;
-        margin-left: 16px;
-        width: 35px;
-        height: 35px;
-        background: orange;
-        color: #fff;
-        text-align: center;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 15px;
-        display: flex;
-      }
-
-      .btn-toggle:hover {
-          opacity:0.7;
-          background-color:orange;
-      }
-    }
 
     .pro-sidebar > .pro-sidebar-inner {
       background-color:white;
@@ -102,8 +93,6 @@
     .pro-sidebar.lg.collapsed {
       left: -100px;
     }
-    .toggle {
-      display: flex;
-    }
+    
   }
 }

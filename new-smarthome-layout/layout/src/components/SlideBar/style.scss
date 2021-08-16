@@ -3,9 +3,9 @@
 .slide-bar {
     // : 12px 0 12px 12px;
     border-radius: 16px;
-    display:flex;
+    display: flex;
     flex-direction: column;
-    height:100vh;
+    height: 100vh;
     background-color:orange;
     color: white;
 
@@ -76,7 +76,7 @@
 
     .current:hover, .slide-items:hover { 
         color: black; 
-        opacity:0.5;
+        opacity: 0.5;
     }
 
     .slide-items:hover{
@@ -89,7 +89,6 @@
     .slide-bar-content {
         flex-grow: 2;
         margin-top: 20px;
-
     }
 
     .slide-bar-footer {
@@ -107,10 +106,6 @@
 
 @media (max-width: $breakpoint-lg) {
     
-    .pro-sidebar.lg.toggled {
-        // padding: 0;
-    }
-
     .slide-bar {
         border-radius: 0;
         
