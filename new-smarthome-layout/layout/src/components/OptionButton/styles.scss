@@ -1,0 +1,17 @@
+.option-buttons {
+    display:flex;
+    justify-content: space-between;
+    max-width: 300px;
+    margin: auto;
+    position: relative;
+
+    div {
+        background-color: lightgrey;
+        padding: 8px;
+        border-radius: 4px;
+    }
+
+    div + div {
+        background-color: red;
+    }
+}

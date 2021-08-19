@@ -63,5 +63,15 @@ export function useDevices( props: DeviceParams) {
     }
   }, [props.city, props.user_id]);
 
-  return { devices }
+  
+  function getDevicesByRooms() {
+    let groups = devices.reduce( (r,a) => {
+      r[a.roomHint] = [...r[a.roomHint] || [], a];
+      return r;
+    } , {} as any)
+    
+    return groups
+  }
+
+  return { devices, getDevicesByRooms }
 }

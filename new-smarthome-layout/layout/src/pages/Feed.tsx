@@ -1,13 +1,16 @@
+import { useState, FormEvent } from 'react';
 import { useAuth } from '../hooks/useAuth';
-// import { Header } from '../components/Header';
 
 import { useDevices } from '../hooks/useDevices';
-import { Card } from '../components/Card/Card';
-import { ModalComponent } from '../components/Modal/Modal';
-import { useState, FormEvent } from 'react';
+import { useCity } from '../hooks/useCity';
+import { getData } from '../hooks/getData';
+// import { Card } from '../components/Card/Card';
+// import { ModalComponent } from '../components/Modal/Modal';
+import { OptionButton } from '../components/OptionButton/OptionButton';
+import { ContainerItems } from '../components/ContainerItems/ContainerItems';
 // import { CityContextProvider } from '../contexts/CityContext';
 
-import { Dashboard } from '../components/Dashboard/Dashboard';
+// import { Dashboard } from '../components/Dashboard/Dashboard';
 
 import { FiSettings } from 'react-icons/fi';
 import { FaBars } from 'react-icons/fa';
@@ -34,44 +37,77 @@ type FeedProps = {
 export function Feed({ handleToggleSidebar }:FeedProps) {
     const { user } = useAuth()
     
-    const [modal, setModal] = useState({ "open":false, "title": "", fields: [{ type:"input", value:""}], item:"", type:"", value:"" });
-    const [search, setSearch] = useState("")
-    
-    let cities = localStorage.getItem("cities")
-    let sub_menu = [] as string[]
-    let actual = ""
-    if(cities === null)
-      cities =  `{ "actual": "No city", "cities":[] }`
-    
-    let json = JSON.parse(cities)
-    sub_menu = json.cities
-    sub_menu.push("Add new City")
-    actual = json.actual
-    
-    if(actual !== "No city"){ 
-      sub_menu.push("Remove City")
+    // const [modal, setModal] = useState({ "open":false, "title": "", fields: [{ type:"input", value:""}], item:"", type:"", value:"" });
+    const [search, setSearch] = useState('')
+
+    const { cities } = useCity({user_id:user?.id})
+
+    const [actualCity, setActualCity] = useState('Loading')
+
+    // check data from firebase database fro city
+    if(cities.length > 0){
+      if(cities[0].city !== ''){
+        // get from localstatorage
+        const city = localStorage.getItem('actual_city')
+        let json = JSON.parse(city+'')
+
+        // check if not exists data
+        if(json === 'No city' || json === null){
+          json = cities[0].city + ""
+        }
+        // update if city if diferent
+        if(actualCity !== json){
+          localStorage.setItem('actual_city', `"${json}"`)
+          setActualCity(json)
+        }
+        
+      }else {
+        // set no city if dont return data from database
+        localStorage.setItem('actual_city', `"No city"`)
+        if(actualCity !== 'No city'){
+          localStorage.setItem('actual_city', `"No city"`)
+          setActualCity('No city')
+        }
+      }
     }
 
-    const { devices } = useDevices({city:actual,user_id:user?.id} )
+    const { devices, getDevicesByRooms } = useDevices({city:actualCity,user_id:user?.id} )
 
-    function closeModal() {
-      setModal({ "open":false, "title": "", item:"", type:"", fields: [{ type:"input", value:""}], value:""});
-    }
+    // function closeModal() {
+    //   setModal({ "open":false, "title": "", item:"", type:"", fields: [{ type:"input", value:""}], value:""});
+    // }
   
-    function groupByRoom() {
+    // function groupByRoom() {
       // divide os dispostivos em grupos
-      let groups = devices.reduce( (r,a) => {
-        r[a.roomHint] = [...r[a.roomHint] || [], a];
-        return r;
-      } , {} as any)
-      return groups
+      // let groups = devices.reduce( (r,a) => {
+      //   r[a.roomHint] = [...r[a.roomHint] || [], a];
+      //   return r;
+      // } , {} as any)
+      // return groups
+    // }
+
+    function handleSelect(event: FormEvent<HTMLSelectElement>) {
+      event.preventDefault();
+
+      console.log(event.currentTarget.value)
+      localStorage.setItem('actual_city',`"${event.currentTarget.value}"`)
+      
+      setActualCity(event.currentTarget.value)
     }
 
+    function handleClickBtn(event: FormEvent){
+      event.preventDefault();
+      const idBtn = event.currentTarget.id
+      console.log(idBtn)
+
+      if(idBtn[0] === 'actualCity'){
+
+      }
+
+    }
 
     return (
       <div id="page-feed">
-        {/* <Header name={user?.name} avatar={user?.avatar}>
-        </Header> */}
         
         <header>
           <div className="toggle">     
@@ -90,18 +126,69 @@ export function Feed({ handleToggleSidebar }:FeedProps) {
             <div className='user-name'>{user?.name}</div>
           </div>
         </header>
-        <div className="main">
-          <div className='central'>center</div>
-          <div className='right'>right</div>
+        <div className='main'>
+          <div className='central'>
+            <div className='resume'>
+              Resumo
+            </div>
+            <div className='title'>
+              <span>{user?.name}'s Home</span>
+              <select name="room" id="room">
+                {
+                  Object.entries(getDevicesByRooms()).map(([key,group],index) => {
+                    return <option key={index} value={key}>{key === '' ? 'No room': key }</option>
+                  })
+                }
+
+              </select>
+            </div>
+            <div className="main-device">teste</div>
+            <div className="devices">
+              <div>1</div>
+              <div>2</div>
+            </div>
+          </div>
+          <div className='right'>
+            <ContainerItems 
+              title={'Actual city:'}
+              type={'cities'} 
+              valueSelect={actualCity} 
+              openSelect={true} 
+              titleSelect={'Choose one city:'}
+              defaultSelect={'No city'}
+              arraySelect={cities.map( (city) => {return city.city+''}) } 
+              handleSelect={handleSelect} 
+              handleClickBtn={handleClickBtn} >
+                <div className='qtd-devices'>
+                  {getData()}
+                {Object.entries(getDevicesByRooms()).map(([key,group]:any,index) => {
+                  console.log(group.length)
+                    return <div key={index} className='qtd-devices-room' style={{ backgroundColor: `rgb(${(index+1%4)*80} , ${(index+1%4)*40}, ${(index+1%4)*20})` }}>
+                        <div className='title'>{key === '' ? 'No room': key }</div>
+                        <div>{group.length} Device{group.length > 1 && 's'}</div>
+                      </div>
+                  })
+                  }</div>
+                {/* <OptionButton /> */}
+              </ContainerItems>
+              
+            <ContainerItems 
+              title={'Members'} 
+              type={'members'} 
+              openContent={true} 
+              handleSelect={handleSelect} 
+              handleClickBtn={handleClickBtn} >
+                <div> teste </div>
+                </ContainerItems>
+          </div>
         </div>
         {/* <main>
             <Dashboard actual={actual} setModal={setModal} sub_menu={sub_menu}/>
             { user &&
               <div className="main-content">
                 { 
-                  Object.entries(groupByRoom()).map(([key,group],index) => {
-                    return (
-                      <div key={index} className='card-list'>
+                  Object.entries(groupByRoom()).map(([key,group],indeindex) => {index                    return (
+                      <diindex key={index} className='card-list'>
                         <div className="card-list-title">{key === "" ? "Assign device to a room":key}</div>
                         <div className="card-list-devices">
                         {

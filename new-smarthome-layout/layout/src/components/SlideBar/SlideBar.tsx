@@ -6,20 +6,23 @@ import { useHistory, useLocation } from "react-router-dom";
 import { FiLogOut, FiHome } from 'react-icons/fi';
 import { RiDashboardLine } from 'react-icons/ri';
 
+import { useAuth } from '../../hooks/useAuth';
+
 import './style.scss'
 
 type SlideBarProps = {
     toggled: boolean;
     collapsed: boolean;
+    urls: string[];
+    menus: string[];
     handleToggleSidebar: (value:boolean) => void;
 }
 
-export default function SlideBar({ toggled, collapsed, handleToggleSidebar }:SlideBarProps) {
+export default function SlideBar({ toggled, urls, menus, collapsed, handleToggleSidebar }:SlideBarProps) {
     const history = useHistory();
     const location = useLocation();  
+    const { logout } = useAuth()
     
-    const menus = [ 'Feed', 'Teste']
-    const urls = ['/feed','/teste']
     const imgs = [RiDashboardLine,RiDashboardLine]
 
     // obtem a atual url e configura estado atual do menu 
@@ -43,9 +46,9 @@ export default function SlideBar({ toggled, collapsed, handleToggleSidebar }:Sli
             setMenuState(idMenuItem)
         }else{
             if(idMenuItem === 'Logout')
-                console.log(idMenuItem)
+                logout()
             else if(idMenuItem === 'Home')
-                console.log(idMenuItem)
+                window.location.reload();
         }
         handleToggleSidebar(false);
     }
@@ -56,7 +59,7 @@ export default function SlideBar({ toggled, collapsed, handleToggleSidebar }:Sli
             toggled={toggled}
             collapsed={collapsed}
             onToggle={handleToggleSidebar}
-            style={{backgroundColor: 'white'}}
+            style={{backgroundColor: '#F8F8F8'}}
         >
             
             <div className="slide-bar">

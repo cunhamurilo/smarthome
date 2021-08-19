@@ -27,7 +27,7 @@
         .slide-items-header, .slide-items-footer {
             height:12px;
             width: 100%;
-            background-color:white;
+            background-color:#F8F8F8;
             
             div {
                 background-color:orange;
@@ -63,7 +63,7 @@
         } 
         
         .slide-items-content{
-            background-color:white;
+            background-color:#F8F8F8;
             border-radius: 20px 0 0 20px;
         }
 
@@ -102,8 +102,6 @@
     }
 }
 
-
-
 @media (max-width: $breakpoint-lg) {
     
     .slide-bar {
@@ -129,7 +127,7 @@
             } 
             
             .slide-items-content{
-                background-color:white;
+                background-color:#F8F8F8;
                 border-radius: 20px 0 0 20px;
             }
 
