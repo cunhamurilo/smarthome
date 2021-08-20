@@ -3,10 +3,10 @@ import { useAuth } from '../hooks/useAuth';
 
 import { useDevices } from '../hooks/useDevices';
 import { useCity } from '../hooks/useCity';
-import { getData } from '../hooks/getData';
+import { useWeather } from '../hooks/useWeather';
 // import { Card } from '../components/Card/Card';
 // import { ModalComponent } from '../components/Modal/Modal';
-import { OptionButton } from '../components/OptionButton/OptionButton';
+// import { OptionButton } from '../components/OptionButton/OptionButton';
 import { ContainerItems } from '../components/ContainerItems/ContainerItems';
 // import { CityContextProvider } from '../contexts/CityContext';
 
@@ -17,18 +17,18 @@ import { FaBars } from 'react-icons/fa';
 
 import '../styles/feed.scss';
 
-interface DeviceType {
-  id: string;
-  city: string | undefined;
-  name: string;
-  roomHint: string | "";
-  traits: {
-    OnOff?: {on:boolean};
-    Brightness?: {brightness:number};
-    ArmDisarm?: {isArmed:boolean};
-  };
-  type: string;
-}
+// interface DeviceType {
+//   id: string;
+//   city: string | undefined;
+//   name: string;
+//   roomHint: string | "";
+//   traits: {
+//     OnOff?: {on:boolean};
+//     Brightness?: {brightness:number};
+//     ArmDisarm?: {isArmed:boolean};
+//   };
+//   type: string;
+// }
 
 type FeedProps = {
   handleToggleSidebar: (value:boolean) => void;
@@ -72,6 +72,7 @@ export function Feed({ handleToggleSidebar }:FeedProps) {
     }
 
     const { devices, getDevicesByRooms } = useDevices({city:actualCity,user_id:user?.id} )
+    const { weather } = useWeather({city:actualCity})
 
     // function closeModal() {
     //   setModal({ "open":false, "title": "", item:"", type:"", fields: [{ type:"input", value:""}], value:""});
@@ -150,35 +151,49 @@ export function Feed({ handleToggleSidebar }:FeedProps) {
           </div>
           <div className='right'>
             <ContainerItems 
-              title={'Actual city:'}
+              title={'City:'}
               type={'cities'} 
               valueSelect={actualCity} 
               openSelect={true} 
               titleSelect={'Choose one city:'}
               defaultSelect={'No city'}
+              backgroundContent={true}
               arraySelect={cities.map( (city) => {return city.city+''}) } 
               handleSelect={handleSelect} 
               handleClickBtn={handleClickBtn} >
+                <div className='weather-info'>
+                  { weather.humidity > 0 ?
+                    <>
+                      <img src={weather.icon} alt="weather" />
+                      <div className='weather-items'>
+                        <div className='item-title'>{weather.temp}°c</div>
+                        <div className='item-subtitle'>Temperature</div>
+                      </div>
+                      <div className='weather-items'>
+                        <div className='item-title'>{weather.humidity}%</div>
+                        <div className='item-subtitle'>Humidity</div>
+                      </div>
+                    </>
+                    :
+                    <div>Unable to get weather information</div>
+                  }
+                </div>
+                {/* <OptionButton /> */}
+              </ContainerItems>
+              
+            <ContainerItems 
+              title={'Devices'} 
+              type={'devices'} 
+              handleSelect={handleSelect} 
+              handleClickBtn={handleClickBtn} >
                 <div className='qtd-devices'>
-                  {getData()}
                 {Object.entries(getDevicesByRooms()).map(([key,group]:any,index) => {
-                  console.log(group.length)
                     return <div key={index} className='qtd-devices-room' style={{ backgroundColor: `rgb(${(index+1%4)*80} , ${(index+1%4)*40}, ${(index+1%4)*20})` }}>
                         <div className='title'>{key === '' ? 'No room': key }</div>
                         <div>{group.length} Device{group.length > 1 && 's'}</div>
                       </div>
                   })
                   }</div>
-                {/* <OptionButton /> */}
-              </ContainerItems>
-              
-            <ContainerItems 
-              title={'Members'} 
-              type={'members'} 
-              openContent={true} 
-              handleSelect={handleSelect} 
-              handleClickBtn={handleClickBtn} >
-                <div> teste </div>
                 </ContainerItems>
           </div>
         </div>

@@ -12,12 +12,19 @@ type ButtonProps = {
     defaultSelect?: string;
     arraySelect?: string[];
     openContent?: boolean;
+    backgroundContent?: boolean;
     children?: ReactNode;
     handleSelect:  (event: FormEvent<HTMLSelectElement>) => void ;
     handleClickBtn: (event: FormEvent) => void;
 };
 
-export function ContainerItems({ title, type, valueSelect, openSelect = false, titleSelect='', defaultSelect='', arraySelect= [], openContent = false, handleSelect, handleClickBtn, children, ...props }: ButtonProps) {
+export function ContainerItems({ 
+    title, type, valueSelect, 
+    openSelect = false, titleSelect='', defaultSelect='', arraySelect= [], 
+    openContent = false,  backgroundContent = false,
+    handleSelect, handleClickBtn, children, ...props 
+}: ButtonProps) {
+
     const [open, setOpenContent] = useState(openContent)
 
     function handleClickBtn2(event: FormEvent){
@@ -48,7 +55,7 @@ export function ContainerItems({ title, type, valueSelect, openSelect = false, t
                     </div>
                 </div>
             </div>
-            <div className={open ? 'container-item-content active': 'container-item-content'}>
+            <div className={'container-item-content'} style={{backgroundColor: backgroundContent ? 'white': 'none'}}>
                 {children}
             </div>
         </div>
