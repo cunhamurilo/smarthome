@@ -162,6 +162,11 @@
                 // -moz-box-shadow: 0 0 5px #DAE1EC;
                 box-shadow: 0 0 5px #DAE1EC;
             }
+
+            .devices {
+                display: flex;
+                flex-wrap: wrap;
+            }
         }
 
         .right {

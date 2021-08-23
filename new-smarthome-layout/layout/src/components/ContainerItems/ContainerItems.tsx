@@ -1,4 +1,4 @@
-import { FormEvent, useState,ReactNode } from 'react';
+import { FormEvent, ReactNode } from 'react';
 import { FiArrowRight } from 'react-icons/fi';
 
 import './styles.scss';
@@ -15,19 +15,18 @@ type ButtonProps = {
     backgroundContent?: boolean;
     children?: ReactNode;
     handleSelect:  (event: FormEvent<HTMLSelectElement>) => void ;
-    handleClickBtn: (event: FormEvent) => void;
 };
 
 export function ContainerItems({ 
     title, type, valueSelect, 
     openSelect = false, titleSelect='', defaultSelect='', arraySelect= [], 
     openContent = false,  backgroundContent = false,
-    handleSelect, handleClickBtn, children, ...props 
+    handleSelect, children, ...props 
 }: ButtonProps) {
 
-    const [open, setOpenContent] = useState(openContent)
+    // const [open, setOpenContent] = useState(openContent)
 
-    function handleClickBtn2(event: FormEvent){
+    function handleClickBtn(event: FormEvent){
         event.preventDefault();
         const idBtn = event.currentTarget.id
         console.log(idBtn)
@@ -50,7 +49,7 @@ export function ContainerItems({
                         })}
                     </select>
                 }
-                <div className='option' id={`option-${type}`} onClick={handleClickBtn2}>
+                <div className='option' id={`option-${type}`} onClick={handleClickBtn}>
                     <FiArrowRight />
                     </div>
                 </div>

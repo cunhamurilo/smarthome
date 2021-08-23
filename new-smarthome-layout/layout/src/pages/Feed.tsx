@@ -16,19 +16,20 @@ import { FiSettings } from 'react-icons/fi';
 import { FaBars } from 'react-icons/fa';
 
 import '../styles/feed.scss';
+import { CardDevice } from '../components/CardDevice/CardDevice';
 
-// interface DeviceType {
-//   id: string;
-//   city: string | undefined;
-//   name: string;
-//   roomHint: string | "";
-//   traits: {
-//     OnOff?: {on:boolean};
-//     Brightness?: {brightness:number};
-//     ArmDisarm?: {isArmed:boolean};
-//   };
-//   type: string;
-// }
+interface DeviceType {
+  id: string;
+  city: string | undefined;
+  name: string;
+  roomHint: string | "";
+  traits: {
+    OnOff?: {on:boolean};
+    Brightness?: {brightness:number};
+    ArmDisarm?: {isArmed:boolean};
+  };
+  type: string;
+}
 
 type FeedProps = {
   handleToggleSidebar: (value:boolean) => void;
@@ -71,40 +72,26 @@ export function Feed({ handleToggleSidebar }:FeedProps) {
       }
     }
 
-    const { devices, getDevicesByRooms } = useDevices({city:actualCity,user_id:user?.id} )
+    const { getDevicesByRooms } = useDevices({city:actualCity,user_id:user?.id} )
     const { weather } = useWeather({city:actualCity})
-
-    // function closeModal() {
+    const [actualRoom, setActualRoom] = useState('')
+    
+      // function closeModal() {
     //   setModal({ "open":false, "title": "", item:"", type:"", fields: [{ type:"input", value:""}], value:""});
     // }
   
-    // function groupByRoom() {
-      // divide os dispostivos em grupos
-      // let groups = devices.reduce( (r,a) => {
-      //   r[a.roomHint] = [...r[a.roomHint] || [], a];
-      //   return r;
-      // } , {} as any)
-      // return groups
-    // }
-
     function handleSelect(event: FormEvent<HTMLSelectElement>) {
       event.preventDefault();
-
-      console.log(event.currentTarget.value)
-      localStorage.setItem('actual_city',`"${event.currentTarget.value}"`)
       
-      setActualCity(event.currentTarget.value)
-    }
-
-    function handleClickBtn(event: FormEvent){
-      event.preventDefault();
-      const idBtn = event.currentTarget.id
-      console.log(idBtn)
-
-      if(idBtn[0] === 'actualCity'){
-
+      switch(event.currentTarget.id) {
+        case 'city':
+          localStorage.setItem('actual_city',`"${event.currentTarget.value}"`)
+          setActualCity(event.currentTarget.value) 
+          break;
+        case 'room':
+          setActualRoom(event.currentTarget.value)
+          break;
       }
-
     }
 
     return (
@@ -134,33 +121,41 @@ export function Feed({ handleToggleSidebar }:FeedProps) {
             </div>
             <div className='title'>
               <span>{user?.name}'s Home</span>
-              <select name="room" id="room">
+              <select name="room" id="room" onChange={handleSelect} value={actualRoom}>
                 {
                   Object.entries(getDevicesByRooms()).map(([key,group],index) => {
                     return <option key={index} value={key}>{key === '' ? 'No room': key }</option>
                   })
                 }
-
               </select>
             </div>
-            <div className="main-device">teste</div>
+            <div className="main-device" key='-1'>teste</div>
             <div className="devices">
-              <div>1</div>
-              <div>2</div>
+              { 
+                Object.entries(getDevicesByRooms()).map(([key,group],index) => { 
+                  if(key === actualRoom){
+                    return ( 
+                      Object.values(group as DeviceType).map((device, cont) => {
+                        return <CardDevice key={cont} device={device} />
+                      })
+                    )
+                  }
+                  return ''
+                })
+              } 
             </div>
           </div>
           <div className='right'>
             <ContainerItems 
               title={'City:'}
-              type={'cities'} 
+              type={'city'} 
               valueSelect={actualCity} 
               openSelect={true} 
               titleSelect={'Choose one city:'}
               defaultSelect={'No city'}
               backgroundContent={true}
               arraySelect={cities.map( (city) => {return city.city+''}) } 
-              handleSelect={handleSelect} 
-              handleClickBtn={handleClickBtn} >
+              handleSelect={handleSelect}  >
                 <div className='weather-info'>
                   { weather.humidity > 0 ?
                     <>
@@ -184,10 +179,9 @@ export function Feed({ handleToggleSidebar }:FeedProps) {
             <ContainerItems 
               title={'Devices'} 
               type={'devices'} 
-              handleSelect={handleSelect} 
-              handleClickBtn={handleClickBtn} >
+              handleSelect={handleSelect} >
                 <div className='qtd-devices'>
-                {Object.entries(getDevicesByRooms()).map(([key,group]:any,index) => {
+                  {Object.entries(getDevicesByRooms()).map(([key,group]:any,index) => {
                     return <div key={index} className='qtd-devices-room' style={{ backgroundColor: `rgb(${(index+1%4)*80} , ${(index+1%4)*40}, ${(index+1%4)*20})` }}>
                         <div className='title'>{key === '' ? 'No room': key }</div>
                         <div>{group.length} Device{group.length > 1 && 's'}</div>
@@ -202,8 +196,9 @@ export function Feed({ handleToggleSidebar }:FeedProps) {
             { user &&
               <div className="main-content">
                 { 
-                  Object.entries(groupByRoom()).map(([key,group],indeindex) => {index                    return (
-                      <diindex key={index} className='card-list'>
+                  Object.entries(groupByRoom()).map(([key,group],indeindex) => {                    
+                    return (
+                      <div key={index} className='card-list'>
                         <div className="card-list-title">{key === "" ? "Assign device to a room":key}</div>
                         <div className="card-list-devices">
                         {
