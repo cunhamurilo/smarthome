@@ -29,23 +29,25 @@
     }
 
     .container-item-content {
-        // display: none;
         margin-top: 20px;
         border-radius: 20px;
-        // background-color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         width: 100%;
         padding: 8px;
-        transition: all 0.5s ease-out;
-        overflow: hidden;
+        // transition: all 0.5s ease-out;
+        // overflow: hidden;
 
         .qtd-devices{
             display: flex;
+            justify-content: space-between;
+            width: 100%;
 
             .qtd-devices-room {
-                min-width: 140px;
+                min-width: 160px;
                 height: 80px;
-                margin-left: 8px;
-                padding: 8px;
+                padding: 16px;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
@@ -61,7 +63,9 @@
         .weather-info {
             display: flex;
             justify-content: space-between;
-
+            align-items: center;
+            width: 100%;
+            
             img {
                 width: 70px;
             }
@@ -78,9 +82,6 @@
                 }
             }
 
-            .weather-items + .weather-items {
-                margin-right: 20px;
-            }
         }
     }
 

@@ -32,10 +32,13 @@ export function CardDevice({ device }:CardProps) {
   return (
     <div className='card-device'>
       <div className="card-device-header">
-        <div className="icon">teste</div>
-        <div className="onOff"></div>
+        <div className="onOff">On</div>
+        <div className="onOff">input</div>
       </div>
       <div className='card-device-content'>
+        <div className="icon">icon</div>
+      </div>
+      <div className='card-device-footer'>
         <div className="title">{device.name}</div>
       </div>
     </div>

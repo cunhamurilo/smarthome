@@ -2,17 +2,13 @@
 
 #page-feed {
     display: flex;
-    flex-direction: column;  
-    background:#F8F8F8; 
-    padding: 16px 0 0 24px;
-    height: 100%;
+    flex-direction: column;
+    min-height: 100%;
+    padding: 20px 0 0 40px;
 
     header {
         display:flex;
-        align-items:center; 
-        // width: 100%; 
-        // margin-top: -16px;
-        // flex-wrap:wrap;
+        align-items:center;
         
         .toggle {
             display:none;
@@ -114,9 +110,9 @@
     }
 
     .main {
+        flex: 1;
         display: flex;
         margin-top: 20px;
-        height: 100%;
 
         select {
             flex: 1;
@@ -129,19 +125,20 @@
         }
 
         .central {
-            flex:2;
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            padding-right: 40px;
 
             .resume {
                 background-color: grey;
                 min-height: 200px;
                 border-radius: 20px;
-                margin: 0 20px 0 0;
                 text-align: center;
             }
 
             .title {
                 display: flex;
-                margin: 20px 20px 0 0;
 
                 span {
                     flex: 2;
@@ -156,7 +153,6 @@
                 background: white;
                 border: 1px solid#E0E0E0;
                 border-radius: 20px;
-                margin: 20px 20px 0 0;
                 
                 // -webkit-box-shadow: 0 0 5px #DAE1EC;
                 // -moz-box-shadow: 0 0 5px #DAE1EC;
@@ -166,85 +162,23 @@
             .devices {
                 display: flex;
                 flex-wrap: wrap;
+                justify-content: space-between;
+                // height: 500px;
+                // margin: 20px 20px 0 0;
+            }
+
+            .title, .main-device, .devices {
+                margin-top: 20px;
             }
         }
 
         .right {
-            flex:1;
-            height: 100%;
+            flex: 2;
             background-color: #F0F0F0;
             border-top-left-radius: 20px;
-
-          
         }
     }
 
-    main {
-        display: flex;
-        align-items:center;
-        justify-content:center;
-        flex-direction: column;
-        flex-wrap: wrap;
-        height:100%;
-        padding-top: 40px;
-        
-        .main-content {
-            max-width: 1200px;
-            min-width: 400px;
-            background:#EEEEEE;
-            width:100%;
-            margin-bottom: 40px;
-            
-            .card-list {
-                .card-list-title{
-                    background-color: grey;
-                    padding: 16px;
-                    color: white;
-                    font-size: 28px;
-                }
-                .card-list-devices {
-                    display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    // grid-auto-flow: dense;
-                    // grid-template-rows: auto;
-                    align-items: flex-start;
-                }
-            }
-        }
-    }
-}
-
-@media (max-width: 1250px) {
-    #page-feed {
-        main{
-            .main-content {
-                max-width: 800px;
-                .card-list {
-                    .card-list-devices{
-                        grid-template-columns: repeat(2, 1fr);
-                        align-items: flex-start;
-                    }
-                }
-            }
-        }
-    }
-}
-
-@media (max-width: 900px) {
-    #page-feed {
-        main{
-            .main-content {
-                max-width: 500px;
-                .card-list {
-                    .card-list-devices{
-                        display:flex;
-                        flex-wrap: wrap;
-                        justify-content: center;
-                    }
-                }
-            }
-        }
-    }
 }
 
 @media (max-width: $breakpoint-lg) {
@@ -292,16 +226,6 @@
 
         .main {
             flex-direction: column; 
-        }
-    }
-}
-
-@media (max-width: 560px) {
-    #page-feed {
-        main{
-            .main-content {
-                max-width: 450px;
-            }
         }
     }
 }
