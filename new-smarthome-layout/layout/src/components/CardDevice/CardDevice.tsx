@@ -30,7 +30,9 @@ type CardProps = {
   
 export function CardDevice({ device }:CardProps) {
   return (
-    <div className='card-device'>
+    <div className='card-device' >
+      <input id={device.id} type="radio" name='radio-device' hidden />
+      <label htmlFor={device.id}>
       <div className="card-device-header">
         <div className="onOff">On</div>
         <div className="onOff">input</div>
@@ -41,6 +43,7 @@ export function CardDevice({ device }:CardProps) {
       <div className='card-device-footer'>
         <div className="title">{device.name}</div>
       </div>
+      </label>
     </div>
   )
 }

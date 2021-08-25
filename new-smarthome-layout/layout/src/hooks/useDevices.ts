@@ -73,5 +73,5 @@ export function useDevices( props: DeviceParams) {
     return groups
   }
 
-  return { devices, getDevicesByRooms }
+  return { devices, getDevicesByRooms  }
 }

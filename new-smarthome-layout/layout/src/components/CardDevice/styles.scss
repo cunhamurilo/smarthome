@@ -1,15 +1,30 @@
 .card-device {
-    background-color: white;
-    border: 1px solid lightgray;
-    margin-top: 40px;
-    border-radius: 16px;
-    padding: 16px;
-    width: 210px;
-    height: 140px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
 
+    label {
+        background-color: white;
+        border: 1px solid lightgray;
+        margin-top: 40px;
+        border-radius: 16px;
+        padding: 16px;
+        width: 210px;
+        height: 140px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+
+    input[name="radio-device"]:checked + label {
+        background-color: orange;
+   }
+
+
+    & > input[name='radio-device']:checked { 
+        // width: 100px;
+        background-color: red;
+        color:red;
+    }
+    
     .card-device-header {
         // background-color: green;
         display: flex;

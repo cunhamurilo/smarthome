@@ -40,6 +40,7 @@ export function Feed({ handleToggleSidebar }:FeedProps) {
     
     // const [modal, setModal] = useState({ "open":false, "title": "", fields: [{ type:"input", value:""}], item:"", type:"", value:"" });
     const [search, setSearch] = useState('')
+    const [deviceSelected, setDeviceSelected] = useState('')
 
     const { cities } = useCity({user_id:user?.id})
 
@@ -72,7 +73,7 @@ export function Feed({ handleToggleSidebar }:FeedProps) {
       }
     }
 
-    const { getDevicesByRooms } = useDevices({city:actualCity,user_id:user?.id} )
+    const { devices, getDevicesByRooms } = useDevices({city:actualCity,user_id:user?.id} )
     const { weather } = useWeather({city:actualCity})
     const [actualRoom, setActualRoom] = useState('')
     
@@ -92,6 +93,16 @@ export function Feed({ handleToggleSidebar }:FeedProps) {
           setActualRoom(event.currentTarget.value)
           break;
       }
+    }
+
+    function handleRadioButton(event: FormEvent){
+      let input = event.currentTarget.querySelector('input:checked')
+      setDeviceSelected(input?.id || '')
+    }
+
+    function getSelectedDevice(idDevice: string){
+      const found = devices.find((device, index) => device.id === idDevice)
+      return found?.name
     }
 
     return (
@@ -129,8 +140,8 @@ export function Feed({ handleToggleSidebar }:FeedProps) {
                 }
               </select>
             </div>
-            <div className="main-device" key='-1'>teste</div>
-            <div className="devices">
+            <div className="main-device">teste{getSelectedDevice(deviceSelected)}</div>
+            <form className="devices" onChange={handleRadioButton}>
               { 
                 Object.entries(getDevicesByRooms()).map(([key,group],index) => { 
                   if(key === actualRoom){
@@ -143,7 +154,7 @@ export function Feed({ handleToggleSidebar }:FeedProps) {
                   return ''
                 })
               } 
-            </div>
+            </form>
           </div>
           <div className='right'>
             <ContainerItems 
